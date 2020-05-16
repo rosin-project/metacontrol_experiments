@@ -74,7 +74,7 @@ do
 			# roslaunch mros1_reasoner run.launch onto:=mvp.owl;
 			# exit"
 			echo "Running log and stop simulation node"
-			bash -ic "source $METACONTROL_WS_PATH/devel/setup.bash; rosrun metacontrol_experiments stop_simulation_node;"
+			bash -ic "source $METACONTROL_WS_PATH/devel/setup.bash; roslaunch metacontrol_experiments stop_simulation.launch; "
 			echo "Simulation Finished!!"
 			# Check that there are not running ros nodes
 			kill_running_ros_nodes

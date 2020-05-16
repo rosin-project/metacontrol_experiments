@@ -219,6 +219,7 @@ void LogData::stop_simulation()
 {
   ROS_INFO("[STOP SIM :: stop_simulation] Killing nodes");
   std::system("rosnode kill /fake_localization");
+  std::system("rosnode kill /record_bag_node");
   sleep(1);
 }
 

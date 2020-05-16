@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="log_path" default="$(find metacontrol_experiments)/data/"/>
+    <arg name="bag_store_path" default="$(find metacontrol_experiments)/bags/"/>
+    <node pkg="metacontrol_experiments" type="stop_simulation_node" name="stop_simulation_node" output="screen" required="true">
+        <param name="data_log_folder" value="$(arg log_path)"/>
+        <param name="store_data_freq" value="1.0" type="double"/>
+    </node>
+    <!-- Record data  -->
+    <node pkg="rosbag" type="record" name="record_bag_node" output="screen"
+        args="-o $(arg bag_store_path)/metacontrol_
+        /amcl_pose
+        /power_load
+        /odom
+        /imu/data
+        /d_obstacle
+        /diagnostics
+        /move_base/result
+        /move_base/goal"
+        required="true">
+    </node>
+
+</launch>
