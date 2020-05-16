@@ -6,12 +6,14 @@ Controls simulation for metacontrol_sim
 ### Edit WS path variables
 create a `config.sh` file in the same folder as the `run.sh` defining your values for these variables
 
+An example would be:
+
 ```
 #!/bin/bash
 
-METACONTROL_WS_PATH=path/to/your/metacontrol_ws
-REASONER_WS_PATH=path/to/your/metacontrol_ws
-PYTHON3_VENV_PATH=path/to/your/metacontrol_ws
+METACONTROL_WS_PATH=/path/to/your/metacontrol_ws
+REASONER_WS_PATH=/path/to/your/reasoner_ws
+PYTHON3_VENV_PATH=/path/to/your/rospython3_ws
 ```
 
 ### Run the script
