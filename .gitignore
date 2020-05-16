@@ -25,6 +25,9 @@ devel_isolated/
 *.dox
 *.wikidoc
 
+# Ignore csv
+*.csv
+
 # eclipse stuff
 .project
 .cproject
