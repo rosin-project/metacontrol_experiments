@@ -4,13 +4,12 @@ Controls simulation for metacontrol_sim
 ## Usage:
 
 ### Edit WS path variables
-On the `run.sh` script edit the following path variables according to your workspaces
+create a `config.sh` file in the same folder as the `run.sh` defining your values for these variables
 
-```
-METACONTROL_WS_PATH="$HOME/ros/metacontrol_ws"
-REASONER_WS_PATH="$HOME/ros/reasoner_metacontrol_ws"
-PYTHON3_VENV_PATH="$HOME/ros/rospy3_melodic/"
-```
+export METACONTROL_WS_PATH
+export REASONER_WS_PATH
+export PYTHON3_VENV_PATH
+
 ### Run the script
 
 Then just run
