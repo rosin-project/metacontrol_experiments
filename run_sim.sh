@@ -1,10 +1,11 @@
  #!/bin/bash
 
 ## Define path for workspaces (needed to run reasoner and metacontrol_sim in different ws)
-
-export METACONTROL_WS_PATH="$HOME/ros/metacontrol_ws"
-export REASONER_WS_PATH="$HOME/ros/reasoner_metacontrol_ws"
-export PYTHON3_VENV_PATH="$HOME/ros/rospy3_melodic/"
+## You need to create a "config.sh file in the same folder defining your values for these variables"
+source config.sh
+export METACONTROL_WS_PATH
+export REASONER_WS_PATH
+export PYTHON3_VENV_PATH
 
 ## Define to store log files
 declare LOG_DATA_PATH="$HOME/models_paper/log_data"
