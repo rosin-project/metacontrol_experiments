@@ -56,6 +56,7 @@
   <build_depend>move_base_msgs</build_depend>
   <build_depend>diagnostic_msgs</build_depend>
   <build_depend>roslib</build_depend>
+  <build_depend>metacontrol_sim</build_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
@@ -63,6 +64,7 @@
   <exec_depend>move_base_msgs</exec_depend>
   <exec_depend>diagnostic_msgs</exec_depend>
   <exec_depend>roslib</exec_depend>
+  <exec_depend>metacontrol_sim</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

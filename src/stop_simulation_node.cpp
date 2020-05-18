@@ -9,6 +9,10 @@
 #include <diagnostic_msgs/KeyValue.h>
 #include <move_base_msgs/MoveBaseActionResult.h>
 #include <move_base_msgs/MoveBaseActionGoal.h>
+#include <metacontrol_sim/IncreaseConsumptionFactor.h>
+#include <metacontrol_sim/IncreaseConsumptionFactorRequest.h>
+#include <metacontrol_sim/IncreaseConsumptionFactorRequest.h>
+
 
 // File managing
 #include <iostream>
@@ -22,6 +26,7 @@ private:
   std::ofstream& log_data_file_;  // reference to the input stream
   // public ros node handle
   ros::NodeHandle nh_;
+  ros::NodeHandle nh_private_;
   ros::Subscriber sub_robot_pos_;
   ros::Subscriber sub_power_load_;
   ros::Subscriber sub_odometry_;
@@ -30,12 +35,11 @@ private:
   ros::Subscriber sub_diagnostics_;
   ros::Subscriber sub_goal_result_;
   ros::Subscriber sub_goal_;
-
-
  
 public:
   LogData(std::ofstream& log_file, 
-          const ros::NodeHandle &node_handle);
+          const ros::NodeHandle &node_handle,
+          const ros::NodeHandle &node_handle_priv);
   ~LogData();
   geometry_msgs::Point rob_pos_;
   geometry_msgs::Point goal_pos_;
@@ -48,11 +52,15 @@ public:
   ros::Timer store_info_timer_;
 
 
+
   std::string data_log_filename_;
   
   int goal_counter_;
   int goal_failed_counter_;
   bool goal_rached_;
+  bool increase_power_;
+  float increase_power_factor_;
+
 
 
   
@@ -82,18 +90,23 @@ public:
   double goal_distance ();
   void updateQA(const diagnostic_msgs::DiagnosticStatus diagnostic_status);
 
+  ros::ServiceClient inc_power_client;
+  
 
 };
 
-LogData::LogData(std::ofstream& log_file, const ros::NodeHandle &node_handle) 
+LogData::LogData(std::ofstream& log_file, const ros::NodeHandle &node_handle, const ros::NodeHandle &node_handle_priv) 
 : log_data_file_(log_file),
 nh_(node_handle),
+nh_private_(node_handle_priv),
 goal_counter_(0),
 goal_failed_counter_(0),
 dist_to_obstacle_(0),
 linear_accel_x_(0),
 power_load_(0),
-goal_rached_(false)
+goal_rached_(false),
+increase_power_(false),
+increase_power_factor_(0.0)
 {
 
   int ret_val;
@@ -101,11 +114,21 @@ goal_rached_(false)
   std::string data_log_folder;
   double prediction_length;
   double store_log_freq;
+  double increase_power_factor;
 
   log_data_file_ = std::ofstream();
 
-  nh_.param("data_log_folder", data_log_folder, ros::package::getPath("metacontrol_experiments") + std::string("/data/"));
-  nh_.param("store_data_freq", store_log_freq, 1.0);
+  nh_private_.param("data_log_folder", data_log_folder, ros::package::getPath("metacontrol_experiments") + std::string("/data/"));
+  nh_private_.param("store_data_freq", store_log_freq, 1.0);
+  nh_private_.param("increase_power_factor", increase_power_factor, 0.0);
+
+  if (increase_power_factor > 0)
+  {
+    ROS_INFO("[STOP SIM] Will increase power consumption by %.2f after 0.6 of the path is completed", increase_power_factor);
+    increase_power_factor_ = increase_power_factor;
+    increase_power_ = true;
+  }
+  
 
   sub_robot_pos_ = nh_.subscribe("/amcl_pose", 1, &LogData::robot_pose_callback, this);
   sub_power_load_ = nh_.subscribe("/power_load", 1, &LogData::power_load_callback, this);
@@ -122,17 +145,25 @@ goal_rached_(false)
 
   log_data_file_.exceptions (std::ifstream::failbit | std::ifstream::badbit);
 
-  if( !write_log_header() )
+  if(store_log_freq > 0)
   {
-     ROS_ERROR("[STOP SIM] Error in log file");
+    if( !write_log_header() )
+    {
+      ROS_ERROR("[STOP SIM] Error in log file");
+    }
+    else
+    {
+      ROS_INFO("[STOP SIM] Logging to %s", data_log_filename_.c_str());
+      store_info_timer_ = nh_.createTimer(ros::Duration(1.0/store_log_freq), &LogData::timerCallback, this, false, false);
+    }
   }
   else
   {
-    ROS_INFO("[STOP SIM] Logging to %s", data_log_filename_.c_str());
-    store_info_timer_ = nh_.createTimer(ros::Duration(1.0/store_log_freq), &LogData::timerCallback, this, false, false);
-    ROS_INFO("[STOP SIM] Node Initialization Completed");
-
+    ROS_INFO("[STOP SIM] Not Logging to .csv");
   }
+  
+  inc_power_client = nh_.serviceClient<metacontrol_sim::IncreaseConsumptionFactor>("/increase_power_consumption");
+  ROS_INFO("[STOP SIM] Node Initialization Completed");
 }
 
 
@@ -386,36 +417,49 @@ int main(int argc, char **argv){
   ROS_INFO("[STOP SIM] - Start node");
 
   std::ofstream log_file;
-  LogData log_data = LogData(log_file, nh);
+  LogData log_data = LogData(log_file, nh, nh_private);
   
   ROS_INFO("Initialized an async multi-thread node.");
   ros::AsyncSpinner async_spinner(4);  // Use 4 threads
       async_spinner.start();
 
   ros::Rate loop_rate(10);
-
+  
+  ROS_INFO("[STOP SIM] - Wait for goal msg");
   while (log_data.goal_pos_.x == 0)
   {
     // wait for goal
-    ROS_INFO("[STOP SIM] - Wait for goal msg");
     loop_rate.sleep();
   }
   log_data.store_info_timer_.start();
+  
   double first_distance = log_data.goal_distance ();
   ROS_INFO("[STOP SIM] - Initial goal distance: %.2f", first_distance);
   ROS_INFO("[STOP SIM] - Wait for robot to reach the goal");
   
   while (ros::ok())
   {
-  
-    // double distance;
-    // distance = log_data.goal_distance ();
-     
+    if (log_data.increase_power_)
+    {
+      double distance;
+      distance = log_data.goal_distance ();
 
-    // if (0.7 > ((first_distance - distance) / first_distance ) > 0.6)
-    // {
-    //   ROS_INFO("[STOP SIM] - 2 / 3 of the route completed");
-    // }
+      if (((first_distance - distance) / first_distance ) > 0.6)
+      {
+        ROS_INFO("[STOP SIM] - 2 / 3 of the route completed");
+        metacontrol_sim::IncreaseConsumptionFactor increase_srv;
+        increase_srv.request.increase_consumption = log_data.increase_power_factor_;
+        if (log_data.inc_power_client.call(increase_srv))
+        {
+          ROS_INFO("Power consumption increased ");
+        }
+        else
+        {
+          ROS_ERROR("Failed to call service /increase_power_consumption");
+        }
+        log_data.increase_power_ = false;
+      }
+    }  
     
     if(log_data.goal_rached_)
     {
