@@ -1,5 +1,15 @@
  #!/bin/bash
 
+ usage()  
+ {
+	echo "Usage: $0 -i <init_position: (1 / 2 / 3)>"
+	echo "          -g <goal_position: (1 / 2 / 3)>"
+	echo "          -n <nav_profile: ('fast' / 'standard' / 'safe')>"
+	echo "          -r <reconfiguration: (true / false)>"
+	echo "          -o <obstacles: (0 / 1 / 2 / 3)>"
+	echo "          -p <increase_power: (0/1.1/1.2/1.3)>"  
+	exit 1 
+ } 
 ## Define path for workspaces (needed to run reasoner and metacontrol_sim in different ws)
 ## You need to create a "config.sh file in the same folder defining your values for these variables"
 source config.sh
@@ -7,6 +17,9 @@ export METACONTROL_WS_PATH
 export REASONER_WS_PATH
 export PYTHON3_VENV_PATH
 
+####
+#  Default values, set if no parameters are given
+####
 
 ## Define initial navigation profile
 # Possible values ("fast" "standard" "safe")
@@ -23,7 +36,7 @@ declare init_position="1"
 declare goal_position="2"
 
 ## Wheter or not to launch reconfiguration (true, false)
-declare launch_reconfiguration=true
+declare launch_reconfiguration="false"
 
 ## Perturbations
 
@@ -35,6 +48,40 @@ declare obstacles="3"
 ## Changes when the euclidean distance to the goal is 0.6 of the initial one
 # Possible values (0: no increase. Any value larger than 0, will be the increase power factor)
 declare increase_power="1.2"
+###
+
+if [ "$1" == "-h" ]
+then
+	usage
+    exit 0
+fi
+
+while getopts ":i:g:n:r:o:p:" opt; do
+  case $opt in
+    i) init_position="$OPTARG"
+    ;;
+    g) goal_position="$OPTARG"
+    ;;
+	n) nav_profile="$OPTARG"
+    ;;
+	r) launch_reconfiguration="$OPTARG"
+    ;;
+	o) obstacles="$OPTARG"
+    ;;
+	p) increase_power="$OPTARG"
+    ;;
+    \?) echo "Invalid option -$OPTARG" >&2
+	usage
+    ;;
+  esac
+done
+
+#printf "Argument init_position is %s\n" "$init_position"
+#printf "Argument goal_position is %s\n" "$goal_position"
+#printf "Argument nav_profile is %s\n" "$nav_profile"
+#printf "Argument launch reconfiguration is %s\n" "$launch_reconfiguration"
+#printf "Argument obstacles is %s\n" "$obstacles"
+#printf "Argument increase power is %s\n" "$increase_power"
 
 wait_for_gzserver_to_end () {
 
@@ -98,6 +145,6 @@ exit "
 echo "Simulation Finished!!"
 
 # Check that there are not running ros nodes
-kill_running_ros_nodes
+# kill_running_ros_nodes
 # Wait for gazebo to end
-wait_for_gzserver_to_end
+# wait_for_gzserver_to_end
