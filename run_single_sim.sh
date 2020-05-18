@@ -8,11 +8,11 @@ export REASONER_WS_PATH
 export PYTHON3_VENV_PATH
 
 
-## Define initial navigation profile 
-# Possible values ("fast" "standard" "safe") 
-#declare NavProfile="fast"
-#declare NavProfile="safe"
-declare NavProfile="standard"
+## Define initial navigation profile
+# Possible values ("fast" "standard" "safe")
+#declare nav_profile="fast"
+#declare nav_profile="safe"
+declare nav_profile="standard"
 
 ## Define initial position
 # Possible values (1, 2, 3)
@@ -23,14 +23,18 @@ declare init_position="1"
 declare goal_position="2"
 
 ## Wheter or not to launch reconfiguration (true, false)
-declare launch_reconfiguration=false
+declare launch_reconfiguration=true
 
 ## Perturbations
 
-## Add unkown obstacles 
+## Add unkown obstacles
 # Possible values (0: no obstalces, 1, 2 3)
 declare obstacles="3"
 
+## Modify power consumpton
+## Changes when the euclidean distance to the goal is 0.6 of the initial one
+# Possible values (0: no increase. Any value larger than 0, will be the increase power factor)
+declare increase_power="1.2"
 
 wait_for_gzserver_to_end () {
 
@@ -89,7 +93,7 @@ fi
 
 echo "Running log and stop simulation node"
 bash -ic "source $METACONTROL_WS_PATH/devel/setup.bash;
-roslaunch metacontrol_experiments stop_simulation.launch obstacles:=$obstacles goal_nr:=$goal_position;
+roslaunch metacontrol_experiments stop_simulation.launch obstacles:=$obstacles goal_nr:=$goal_position increase_power:=$increase_power; 
 exit "
 echo "Simulation Finished!!"
 
