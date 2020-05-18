@@ -40,13 +40,13 @@ if __name__ == '__main__':
   # Initialize a ROS Node
   rospy.init_node('spawn_unknown_obstacles')
   rospack = RosPack()
-  
+  rospy.sleep(6.0)
+
   # Read parameters
   goal_nr = rospy.get_param("~goal_nr", 1)
   n_osbtacles = rospy.get_param("~obstacles", 1)
 
-  if n_osbtacles == 0:
-    rospy.signal_shutdown(0)
+  rospy.loginfo("Adding obstacles: " + str(n_osbtacles))
 
   try:
     dict = load(file(rospack.get_path('metacontrol_experiments')+'/yaml/obstacle_positions_G'+ str(goal_nr) + '.yaml', 'r'))
@@ -64,7 +64,7 @@ if __name__ == '__main__':
       obstacle_pose_array.append(obst_pose)
   except rospy.ROSInterruptException:
     rospy.loginfo("Error loading yaml file")
- 
+
   rospy.loginfo("Adding obstacles.")
 
   try:
