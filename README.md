@@ -1,9 +1,7 @@
 # metacontrol_experiments
 Controls simulation for metacontrol_sim
 
-## Usage:
-
-### Edit WS path variables
+## WS Path  variables
 create a `config.sh` file in the same folder as the `run.sh` defining your values for these variables
 
 An example would be:
@@ -16,14 +14,38 @@ REASONER_WS_PATH=/path/to/your/reasoner_ws
 PYTHON3_VENV_PATH=/path/to/your/rospython3_ws
 ```
 
-### Run the script
+## Run the scripts
 
-Then just run
+There are two scripts, one to run a single simulation and another to run a batch.
+
+### Run a single simulation
+
+The ./run_single_sim.sh accepts the following parameters
 
 ```
-$ ./run.sh
+-i <init_position: (1 / 2 / 3)>
+-g <goal_position: (1 / 2 / 3)>
+-n <nav_profile: ("fast" / "standard" / "safe")>
+-r <Run mros reconfiguration: ("true" / "false")>
+-o <add obstacles: (0 / 1 / 2 / 3)>
+-p <increase_power: (0/1.1/1.2/1.3)>
 ```
 
-### To run the `mros1_reasoner`
+If no parameters are given the default values are used
 
-Uncomment lines 69 - 74
+#### Example of single run
+
+```
+./run_single_sim.sh -p 1 -g 2 -n "safe" -o 2 -r "true" -p 1.2
+```
+
+### Run simulations in batch
+
+Edit the for loops inside `./run_batch_sim.sh` to define set of parameters and whether or not to run reconfiguration
+
+Run the script 
+
+```
+./run_batch_sim.sh 
+```
+
