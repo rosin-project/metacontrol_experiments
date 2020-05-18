@@ -16,20 +16,20 @@ declare NavProfile="standard"
 
 ## Define initial position
 # Possible values (1, 2, 3)
-declare init_position=1
+declare init_position="1"
 
 ## Define goal position
 # Possible values (1, 2, 3)
-declare goal_position=1
+declare goal_position="2"
 
 ## Wheter or not to launch reconfiguration (true, false)
-declare launch_reconfiguration=true
+declare launch_reconfiguration=false
 
 ## Perturbations
 
 ## Add unkown obstacles 
 # Possible values (0: no obstalces, 1, 2 3)
-declare obstacles=3
+declare obstacles="3"
 
 
 wait_for_gzserver_to_end () {
@@ -76,7 +76,7 @@ gnome-terminal --window -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
 gnome-terminal --window --maximize -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
-roslaunch metacontrol_sim MVP_metacontrol_world.launch obstacles:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
+roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
