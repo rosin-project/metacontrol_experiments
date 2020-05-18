@@ -29,8 +29,8 @@ name: G3
     frame_id: 'map'
   pose:
     position:
-      x: 8.4
-      y: 8.5
+      x: 7.9
+      y: 7.0
       z: 0.0
     orientation:
       x: 0.0
