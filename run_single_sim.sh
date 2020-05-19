@@ -145,6 +145,6 @@ exit "
 echo "Simulation Finished!!"
 
 # Check that there are not running ros nodes
-# kill_running_ros_nodes
+kill_running_ros_nodes
 # Wait for gazebo to end
 # wait_for_gzserver_to_end
