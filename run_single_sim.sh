@@ -1,15 +1,16 @@
  #!/bin/bash
 
- usage()  
+ usage()
  {
 	echo "Usage: $0 -i <init_position: (1 / 2 / 3)>"
 	echo "          -g <goal_position: (1 / 2 / 3)>"
 	echo "          -n <nav_profile: ('fast' / 'standard' / 'safe')>"
 	echo "          -r <reconfiguration: (true / false)>"
 	echo "          -o <obstacles: (0 / 1 / 2 / 3)>"
-	echo "          -p <increase_power: (0/1.1/1.2/1.3)>"  
-	exit 1 
- } 
+	echo "          -p <increase_power: (0/1.1/1.2/1.3)>"
+  echo "          -b <record rosbags: ('true' / 'false')>"
+	exit 1
+ }
 ## Define path for workspaces (needed to run reasoner and metacontrol_sim in different ws)
 ## You need to create a "config.sh file in the same folder defining your values for these variables"
 source config.sh
@@ -126,7 +127,7 @@ gnome-terminal --window -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash
 #Sleep Needed to allow other launchers to recognize the roscore
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
-gnome-terminal --window --maximize -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
+gnome-terminal --window -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
 roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
@@ -140,7 +141,7 @@ fi
 
 echo "Running log and stop simulation node"
 bash -ic "source $METACONTROL_WS_PATH/devel/setup.bash;
-roslaunch metacontrol_experiments stop_simulation.launch obstacles:=$obstacles goal_nr:=$goal_position increase_power:=$increase_power; 
+roslaunch metacontrol_experiments stop_simulation.launch obstacles:=$obstacles goal_nr:=$goal_position increase_power:=$increase_power record_bags:=$record_rosbags;
 exit "
 echo "Simulation Finished!!"
 

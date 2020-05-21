@@ -26,9 +26,10 @@ The ./run_single_sim.sh accepts the following parameters
 -i <init_position: (1 / 2 / 3)>
 -g <goal_position: (1 / 2 / 3)>
 -n <nav_profile: ("fast" / "standard" / "safe")>
--r <Run mros reconfiguration: ("true" / "false")>
+-r <run mros reconfiguration: ("true" / "false")>
 -o <add obstacles: (0 / 1 / 2 / 3)>
 -p <increase_power: (0/1.1/1.2/1.3)>
+-b <record rosbags: ("true" / "false")>
 ```
 
 If no parameters are given the default values are used
@@ -43,9 +44,24 @@ If no parameters are given the default values are used
 
 Edit the for loops inside `./run_batch_sim.sh` to define set of parameters and whether or not to run reconfiguration
 
-Run the script 
+Run the script
 
 ```
-./run_batch_sim.sh 
+./run_batch_sim.sh
 ```
 
+## Getting logs
+Two type of logs are available
+### csv files
+
+* `.csv` files of the main parameters are recorded by default
+* The default storage folder is `"$(find metacontrol_experiments)/data/"`
+* The storage folder can be modified in the `launch/stop_simulation.launch` file
+* Store frequency can be modified in the `launch/stop_simulation.launch` file ( 0 means no recording)
+
+
+### rosbags
+
+* `.bag` files can be stored if the parameter -b true is given to the `run_single_sim.sh` scripts
+* The default storage folder is `"$(find metacontrol_experiments)/bags/"`
+* The storage folder can be modified in the `launch/stop_simulation.launch` file
