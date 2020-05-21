@@ -4,7 +4,7 @@
     <arg name="log_path" default="$(find metacontrol_experiments)/data/"/>
     <arg name="record_bags" default="false"/>
     <arg name="bag_store_path" default="$(find metacontrol_experiments)/bags/"/>
-    <arg name="store_data_freq" default="1.0"/>
+    <arg name="store_data_freq" default="2.0"/>
     <arg name="obstacles" default="0"/>
     <arg name="goal_nr" default="1"/>
     <arg name="increase_power" default="0.0"/>
