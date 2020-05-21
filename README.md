@@ -53,8 +53,8 @@ Run the script
 ## Getting logs
 Two type of logs are available
 ### csv files
+The `stop_simulation_node` subscribes to the topics containing the relevant info for the logs, it extracts the corresponding info (i.e. corresponding `key` value from the `diagnostics` topic for the QA) and stores them in a `.csv` at a given frequency as 
 
-* `.csv` files of the main parameters are recorded by default
 * The default storage folder is `"$(find metacontrol_experiments)/data/"`
 * The storage folder can be modified in the `launch/stop_simulation.launch` file
 * Store frequency can be modified in the `launch/stop_simulation.launch` file ( 0 means no recording)
