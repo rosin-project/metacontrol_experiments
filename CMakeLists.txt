@@ -17,6 +17,7 @@ find_package(catkin REQUIRED
   move_base_msgs
   roslib
   metacontrol_sim
+  metacontrol_msgs
 )
 
 ## System dependencies are found with CMake's conventions

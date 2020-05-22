@@ -12,6 +12,7 @@
 #include <metacontrol_sim/IncreaseConsumptionFactor.h>
 #include <metacontrol_sim/IncreaseConsumptionFactorRequest.h>
 #include <metacontrol_sim/IncreaseConsumptionFactorRequest.h>
+#include <metacontrol_msgs/MvpReconfigurationActionGoal.h>
 
 
 // File managing
@@ -35,6 +36,7 @@ private:
   ros::Subscriber sub_diagnostics_;
   ros::Subscriber sub_goal_result_;
   ros::Subscriber sub_goal_;
+  ros::Subscriber reconfig_goal_;
  
 public:
   LogData(std::ofstream& log_file, 
@@ -49,6 +51,7 @@ public:
   float linear_accel_x_;
   std::string qa_energy_;
   std::string qa_safety_;
+  std::string qa_obj_error_;
   ros::Timer store_info_timer_;
 
 
@@ -56,10 +59,23 @@ public:
   std::string data_log_filename_;
   
   int goal_counter_;
+  int reconfig_counter_;
   int goal_failed_counter_;
   bool goal_rached_;
   bool increase_power_;
   float increase_power_factor_;
+  ros::Time init_time_;
+  ros::Time reconfig_init_time_;
+  double reconfig_time_;
+  double max_run_time_;
+  double elapsed_time_;
+  int energy_over_threshold_;
+  int safety_over_threshold_;
+  int energy_under_threshold_;
+  int safety_under_threshold_;
+  double energy_threshold_;
+  double safety_threshold_;
+  
 
 
 
@@ -72,6 +88,7 @@ public:
   void diagnostics_callback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg_diagnostics);
   void goal_result_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg_goal_result);
   void goal_callback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& msg_goal);
+  void reconfig_callback(const metacontrol_msgs::MvpReconfigurationActionGoal::ConstPtr& reconfig_goal);
 
   // Stops simulation by killing a required node
   void stop_simulation();
@@ -100,27 +117,41 @@ LogData::LogData(std::ofstream& log_file, const ros::NodeHandle &node_handle, co
 nh_(node_handle),
 nh_private_(node_handle_priv),
 goal_counter_(0),
+reconfig_counter_(0),
 goal_failed_counter_(0),
 dist_to_obstacle_(0),
 linear_accel_x_(0),
 power_load_(0),
+max_run_time_(500),
+elapsed_time_(0),
 goal_rached_(false),
 increase_power_(false),
-increase_power_factor_(0.0)
+increase_power_factor_(0.0),
+safety_under_threshold_(0),
+energy_under_threshold_(0),
+safety_over_threshold_(0),
+reconfig_time_(0),
+energy_over_threshold_(0)
 {
-
-  int ret_val;
 
   std::string data_log_folder;
   double prediction_length;
   double store_log_freq;
   double increase_power_factor;
+  double max_run_time;
+  double energy_threshold;
+  double safety_threshold;
 
   log_data_file_ = std::ofstream();
 
   nh_private_.param("data_log_folder", data_log_folder, ros::package::getPath("metacontrol_experiments") + std::string("/data/"));
   nh_private_.param("store_data_freq", store_log_freq, 1.0);
   nh_private_.param("increase_power_factor", increase_power_factor, 0.0);
+  nh_private_.param("max_run_time", max_run_time, 500.0);
+  nh_private_.param("energy_threshold", energy_threshold, 0.5);
+  nh_private_.param("safety_threshold", safety_threshold, 0.8);
+  nh_private_.param("max_run_time", max_run_time, 500.0);
+
 
   if (increase_power_factor > 0)
   {
@@ -129,6 +160,9 @@ increase_power_factor_(0.0)
     increase_power_ = true;
   }
   
+  max_run_time_ = max_run_time;
+  energy_threshold_ = energy_threshold;
+  safety_threshold_ = safety_threshold;
 
   sub_robot_pos_ = nh_.subscribe("/amcl_pose", 1, &LogData::robot_pose_callback, this);
   sub_power_load_ = nh_.subscribe("/power_load", 1, &LogData::power_load_callback, this);
@@ -138,6 +172,7 @@ increase_power_factor_(0.0)
   sub_diagnostics_ = nh_.subscribe("/diagnostics", 1, &LogData::diagnostics_callback, this);
   sub_goal_result_ = nh_.subscribe("/move_base/result", 1, &LogData::goal_result_callback, this);
   sub_goal_ = nh_.subscribe("/move_base/goal", 1, &LogData::goal_callback, this);
+  reconfig_goal_ = nh_.subscribe("/rosgraph_manipulator_action_server/goal", 1, &LogData::reconfig_callback, this);
 
   data_log_filename_ = data_log_folder + "log_Metacontrol_sim_";
   data_log_filename_ = data_log_filename_ + get_date(false);
@@ -161,6 +196,7 @@ increase_power_factor_(0.0)
   {
     ROS_INFO("[STOP SIM] Not Logging to .csv");
   }
+
   
   inc_power_client = nh_.serviceClient<metacontrol_sim::IncreaseConsumptionFactor>("/increase_power_consumption");
   ROS_INFO("[STOP SIM] Node Initialization Completed");
@@ -224,6 +260,10 @@ void LogData::updateQA(const diagnostic_msgs::DiagnosticStatus diagnostic_status
   {
     qa_safety_ = diagnostic_status.values[0].value;
   }
+  if (diagnostic_status.values[0].key.compare(0, 2, "ob") == 0)
+  {
+    qa_obj_error_ = diagnostic_status.values[0].value;
+  }
 }
   
 void LogData::goal_result_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg_goal_result)
@@ -243,14 +283,29 @@ void LogData::goal_callback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& 
   goal_pos_ = msg_goal->goal.target_pose.pose.position;
   ROS_INFO("[LogData :: goal_callback] - Goal Pos x %f - y %f", goal_pos_.x, goal_pos_.y);
   goal_counter_ ++;
+  if (goal_counter_ == 1)
+  {
+    init_time_ = ros::Time::now();
+  }
+  else if (goal_counter_ > 1)
+  {
+    // Get elapsed time
+    ros::Duration time_elapsed = ros::Time::now() - reconfig_init_time_;
+    reconfig_time_ = time_elapsed.toSec();
+  }
 }
-
+void LogData::reconfig_callback(const metacontrol_msgs::MvpReconfigurationActionGoal::ConstPtr& reconfig_goal)
+{
+  ROS_INFO("[LogData :: reconfig_callback] - New configuration requested %s", reconfig_goal->goal.desired_configuration_name.c_str());
+  reconfig_init_time_ = ros::Time::now();
+  reconfig_counter_++;
+}
 
 void LogData::stop_simulation()
 {
   ROS_INFO("[STOP SIM :: stop_simulation] Killing nodes");
   std::system("rosnode kill /fake_localization");
-  std::system("rosnode kill /record_bag_node");
+  // std::system("rosnode kill /record_bag_node");
   sleep(1);
 }
 
@@ -290,7 +345,7 @@ std::string LogData::get_date(bool get_hour)
     }
     else
     {
-      std::strftime(the_date, 12, "%d_%m-%H_%M", std::localtime(&now));
+      std::strftime(the_date, 12, "%d-%H_%M_%S", std::localtime(&now));
     }
   }
 
@@ -328,8 +383,16 @@ bool LogData::write_log_header()
     log_data_file_ << "linear_accel_x, ";
     log_data_file_ << "QA_energy, ";
     log_data_file_ << "QA_safety, ";
+    log_data_file_ << "QA_error, ";
+    log_data_file_ << "safety_over_threshold, ";
+    log_data_file_ << "safety_under_threshold, ";
+    log_data_file_ << "energy_over_threshold, ";
+    log_data_file_ << "energy_under_threshold, ";
     log_data_file_ << "n_reconfigurations, ";
+    log_data_file_ << "reconfig_time, ";
+    log_data_file_ << "received_goals, ";
     log_data_file_ << "failed_goals, ";
+    log_data_file_ << "run_time ";
     log_data_file_ << "\n";
     log_data_file_.close();
     return true;
@@ -378,12 +441,40 @@ void LogData::store_info()
 
       // qa energy and safety
       tmp_string.clear();
-      tmp_string = qa_energy_ + std::string(", ") + qa_safety_ + std::string(", ");
+      tmp_string = qa_energy_ + std::string(", ") + qa_safety_ + std::string(", ") + qa_obj_error_ + std::string(", ");
       log_data_file_ << tmp_string.c_str();
+
+      double energy_numeric = ::atof(qa_energy_.c_str());
+      double safety_numeric = ::atof(qa_safety_.c_str());
+      
+      if (safety_numeric > safety_threshold_)
+      {
+        safety_over_threshold_ += 1;
+      }
+      else
+      {
+        safety_under_threshold_ +=1;
+      }
+      
+      if (energy_numeric > energy_threshold_)
+      {
+        energy_over_threshold_ += 1;
+      }
+      else
+      {
+        energy_under_threshold_ += 1;
+      }
+
+      // under / over thr
+      tmp_string.clear();
+      sprintf(buffer, "%d, %d, %d, %d, ", safety_over_threshold_, safety_under_threshold_, energy_over_threshold_, energy_under_threshold_);
+      tmp_string = buffer;
+      log_data_file_ << tmp_string.c_str();
+      
       
       // n reconfigurations failed goals
       tmp_string.clear();
-      sprintf(buffer, "%d, %d ", goal_counter_, goal_failed_counter_);
+      sprintf(buffer, "%d, %.3f, %d, %d, %.3f",reconfig_counter_, reconfig_time_, goal_counter_, goal_failed_counter_, elapsed_time_);
       tmp_string = buffer;
       log_data_file_ << tmp_string.c_str();
       log_data_file_ << "\n";
@@ -399,7 +490,14 @@ void LogData::store_info()
 
 void LogData::timerCallback(const ros::TimerEvent& event)
 {
-    store_info();
+  // Get elapsed time
+  ros::Duration time_elapsed = ros::Time::now() - init_time_;
+  elapsed_time_ = time_elapsed.toSec();
+  store_info();
+  if (elapsed_time_ > max_run_time_)
+  {
+    goal_rached_ = true;
+  }
 
 }
 
@@ -421,7 +519,8 @@ int main(int argc, char **argv){
   
   ROS_INFO("Initialized an async multi-thread node.");
   ros::AsyncSpinner async_spinner(4);  // Use 4 threads
-      async_spinner.start();
+  
+  async_spinner.start();
 
   ros::Rate loop_rate(10);
   
@@ -455,11 +554,15 @@ int main(int argc, char **argv){
         }
         else
         {
-          ROS_ERROR("Failed to call service /increase_power_consumption");
+          ROS_WARN("Failed to call service /increase_power_consumption");
         }
         log_data.increase_power_ = false;
       }
-    }  
+    }
+    if(log_data.elapsed_time_ >  240)  
+    {
+      ROS_ERROR("240 seconds elapsed and no goal yet");
+    }
     
     if(log_data.goal_rached_)
     {
