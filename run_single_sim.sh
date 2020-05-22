@@ -4,7 +4,7 @@
  {
 	echo "Usage: $0 -i <init_position: (1 / 2 / 3)>"
 	echo "          -g <goal_position: (1 / 2 / 3)>"
-	echo "          -n <nav_profile: ('fast' / 'standard' / 'safe')>"
+	echo "          -n <nav_profile: ('fast' / 'standard' / 'safe' or fX_vX_rX)>"
 	echo "          -r <reconfiguration: (true / false)>"
 	echo "          -o <obstacles: (0 / 1 / 2 / 3)>"
 	echo "          -p <increase_power: (0/1.1/1.2/1.3)>"
@@ -24,9 +24,10 @@ export PYTHON3_VENV_PATH
 
 ## Define initial navigation profile
 # Possible values ("fast" "standard" "safe")
+# also any of the fx_vX_rX metacontrol configurations
 #declare nav_profile="fast"
 #declare nav_profile="safe"
-declare nav_profile="standard"
+declare nav_profile="f1_v1_r1"
 
 ## Define initial position
 # Possible values (1, 2, 3)
@@ -38,6 +39,7 @@ declare goal_position="2"
 
 ## Wheter or not to launch reconfiguration (true, false)
 declare launch_reconfiguration="false"
+
 
 ## Perturbations
 
@@ -63,16 +65,16 @@ while getopts ":i:g:n:r:o:p:" opt; do
     ;;
     g) goal_position="$OPTARG"
     ;;
-	n) nav_profile="$OPTARG"
+    n) nav_profile="$OPTARG"
     ;;
-	r) launch_reconfiguration="$OPTARG"
+    r) launch_reconfiguration="$OPTARG"
     ;;
-	o) obstacles="$OPTARG"
+    o) obstacles="$OPTARG"
     ;;
-	p) increase_power="$OPTARG"
+    p) increase_power="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG" >&2
-	usage
+    	usage
     ;;
   esac
 done
@@ -123,16 +125,17 @@ cat $METACONTROL_WS_PATH/src/metacontrol_experiments/yaml/goal_positions.yaml | 
 echo "Goal position: $goal_position - Initial position  $init_position - Navigation profile: $nav_profile"
 
 echo "Launch roscore"
-gnome-terminal --window -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash; roscore; exit"
+gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash; roscore; exit"
 #Sleep Needed to allow other launchers to recognize the roscore
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
-gnome-terminal --window -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
+gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
+rosparam set /desired_configuration \"$nav_profile\";
 roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
-	gnome-terminal --window -- bash -c "source $PYTHON3_VENV_PATH/venv3.6_ros/bin/activate;
+	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $PYTHON3_VENV_PATH/venv3.6_ros/bin/activate;
 	source $PYTHON3_VENV_PATH/devel/setup.bash;
 	source $REASONER_WS_PATH/devel/setup.bash;
 	roslaunch mros1_reasoner run.launch onto:=mvp.owl;
