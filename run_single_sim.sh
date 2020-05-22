@@ -138,7 +138,7 @@ if [ "$launch_reconfiguration" = true ] ; then
 	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $PYTHON3_VENV_PATH/venv3.6_ros/bin/activate;
 	source $PYTHON3_VENV_PATH/devel/setup.bash;
 	source $REASONER_WS_PATH/devel/setup.bash;
-	roslaunch mros1_reasoner run.launch onto:=mvp.owl;
+	roslaunch mros1_reasoner run.launch onto:=kb.owl;
 	exit"
 fi
 
