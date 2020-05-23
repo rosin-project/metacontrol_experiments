@@ -152,8 +152,8 @@ energy_over_threshold_(0)
   nh_private_.param("store_data_freq", store_log_freq, 1.0);
   nh_private_.param("increase_power_factor", increase_power_factor, 0.0);
   nh_private_.param("max_run_time", max_run_time, 500.0);
-  nh_.param("/nrf_energy", energy_threshold, 0.5);
-  nh_.param("/nrf_safety", safety_threshold, 0.8);
+  nh_.param("/nfr_energy", energy_threshold, 0.5);
+  nh_.param("/nfr_energy", safety_threshold, 0.8);
   nh_private_.param("max_run_time", max_run_time, 500.0);
 
 
