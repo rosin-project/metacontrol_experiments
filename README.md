@@ -30,6 +30,8 @@ The ./run_single_sim.sh accepts the following parameters
 -o <add obstacles: (0 / 1 / 2 / 3)>
 -p <increase_power: (0/1.1/1.2/1.3)>
 -b <record rosbags: ("true" / "false")>
+-e <nfr energy threshold : ([0 - 1])>
+-s <nfr safety threshold : ([0 - 1])>
 ```
 
 If no parameters are given the default values are used
@@ -37,7 +39,7 @@ If no parameters are given the default values are used
 #### Example of single run
 
 ```
-./run_single_sim.sh -p 1 -g 2 -n "safe" -o 2 -r "true" -p 1.2
+./run_single_sim.sh -p 1 -g 2 -n "f1_v1_r1" -o 2 -r "true" -p 1.2
 ```
 
 ### Run simulations in batch

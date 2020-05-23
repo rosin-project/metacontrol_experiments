@@ -8,7 +8,9 @@
 	echo "          -r <reconfiguration: (true / false)>"
 	echo "          -o <obstacles: (0 / 1 / 2 / 3)>"
 	echo "          -p <increase_power: (0/1.1/1.2/1.3)>"
-  echo "          -b <record rosbags: ('true' / 'false')>"
+	echo "          -b <record rosbags: ('true' / 'false')>"
+	echo "          -e <nfr energy threshold : ([0 - 1])>"
+	echo "          -s <nfr safety threshold : ([0 - 1])>"
 	exit 1
  }
 ## Define path for workspaces (needed to run reasoner and metacontrol_sim in different ws)
@@ -40,6 +42,11 @@ declare goal_position="2"
 ## Wheter or not to launch reconfiguration (true, false)
 declare launch_reconfiguration="false"
 
+## nfr energy threshold ([0 - 1])
+declare nfr_energy="0.5"
+
+## nfr safety threshold ([0 - 1])
+declare nfr_safety="0.8"
 
 ## Perturbations
 
@@ -59,7 +66,7 @@ then
     exit 0
 fi
 
-while getopts ":i:g:n:r:o:p:" opt; do
+while getopts ":i:g:n:r:o:p:e:s:" opt; do
   case $opt in
     i) init_position="$OPTARG"
     ;;
@@ -72,6 +79,10 @@ while getopts ":i:g:n:r:o:p:" opt; do
     o) obstacles="$OPTARG"
     ;;
     p) increase_power="$OPTARG"
+    ;;
+	e) nfr_energy="$OPTARG"
+    ;;
+	s) nfr_safety="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG" >&2
     	usage
@@ -131,6 +142,8 @@ sleep 3
 echo "Launching: MVP metacontrol world.launch"
 gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
 rosparam set /desired_configuration \"$nav_profile\";
+rosparam set /nrf_energy \"$nfr_energy\";
+rosparam set /nrf_safety \"$nfr_safety\";
 roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
@@ -139,6 +152,7 @@ if [ "$launch_reconfiguration" = true ] ; then
 	source $PYTHON3_VENV_PATH/devel/setup.bash;
 	source $REASONER_WS_PATH/devel/setup.bash;
 	roslaunch mros1_reasoner run.launch onto:=kb.owl;
+  sleep 20;
 	exit"
 fi
 
