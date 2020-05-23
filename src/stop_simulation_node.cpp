@@ -13,7 +13,7 @@
 #include <metacontrol_sim/IncreaseConsumptionFactorRequest.h>
 #include <metacontrol_sim/IncreaseConsumptionFactorRequest.h>
 #include <metacontrol_msgs/MvpReconfigurationActionGoal.h>
-
+#include <rosgraph_msgs/Log.h>
 
 // File managing
 #include <iostream>
@@ -37,9 +37,9 @@ private:
   ros::Subscriber sub_goal_result_;
   ros::Subscriber sub_goal_;
   ros::Subscriber reconfig_goal_;
- 
+  ros::Subscriber rosout_sub_;
 public:
-  LogData(std::ofstream& log_file, 
+  LogData(std::ofstream& log_file,
           const ros::NodeHandle &node_handle,
           const ros::NodeHandle &node_handle_priv);
   ~LogData();
@@ -52,12 +52,13 @@ public:
   std::string qa_energy_;
   std::string qa_safety_;
   std::string qa_obj_error_;
+  std::string reasoner_error_msg;
   ros::Timer store_info_timer_;
 
 
 
   std::string data_log_filename_;
-  
+
   int goal_counter_;
   int reconfig_counter_;
   int goal_failed_counter_;
@@ -75,11 +76,13 @@ public:
   int safety_under_threshold_;
   double energy_threshold_;
   double safety_threshold_;
-  
+
+  std::string errors_from_reasoner_;
 
 
 
-  
+
+
   void robot_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg_rob_pose);
   void power_load_callback(const std_msgs::Float32::ConstPtr& msg_power_load);
   void odom_callback(const nav_msgs::Odometry::ConstPtr& msg_odom);
@@ -89,6 +92,7 @@ public:
   void goal_result_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg_goal_result);
   void goal_callback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& msg_goal);
   void reconfig_callback(const metacontrol_msgs::MvpReconfigurationActionGoal::ConstPtr& reconfig_goal);
+  void rosout_callback(const rosgraph_msgs::Log::ConstPtr& rosout_msg);
 
   // Stops simulation by killing a required node
   void stop_simulation();
@@ -108,11 +112,11 @@ public:
   void updateQA(const diagnostic_msgs::DiagnosticStatus diagnostic_status);
 
   ros::ServiceClient inc_power_client;
-  
+
 
 };
 
-LogData::LogData(std::ofstream& log_file, const ros::NodeHandle &node_handle, const ros::NodeHandle &node_handle_priv) 
+LogData::LogData(std::ofstream& log_file, const ros::NodeHandle &node_handle, const ros::NodeHandle &node_handle_priv)
 : log_data_file_(log_file),
 nh_(node_handle),
 nh_private_(node_handle_priv),
@@ -148,8 +152,8 @@ energy_over_threshold_(0)
   nh_private_.param("store_data_freq", store_log_freq, 1.0);
   nh_private_.param("increase_power_factor", increase_power_factor, 0.0);
   nh_private_.param("max_run_time", max_run_time, 500.0);
-  nh_private_.param("energy_threshold", energy_threshold, 0.5);
-  nh_private_.param("safety_threshold", safety_threshold, 0.8);
+  nh_.param("/nrf_energy", energy_threshold, 0.5);
+  nh_.param("/nrf_safety", safety_threshold, 0.8);
   nh_private_.param("max_run_time", max_run_time, 500.0);
 
 
@@ -159,7 +163,7 @@ energy_over_threshold_(0)
     increase_power_factor_ = increase_power_factor;
     increase_power_ = true;
   }
-  
+
   max_run_time_ = max_run_time;
   energy_threshold_ = energy_threshold;
   safety_threshold_ = safety_threshold;
@@ -173,6 +177,7 @@ energy_over_threshold_(0)
   sub_goal_result_ = nh_.subscribe("/move_base/result", 1, &LogData::goal_result_callback, this);
   sub_goal_ = nh_.subscribe("/move_base/goal", 1, &LogData::goal_callback, this);
   reconfig_goal_ = nh_.subscribe("/rosgraph_manipulator_action_server/goal", 1, &LogData::reconfig_callback, this);
+  rosout_sub_ = nh_.subscribe("/rosout", 1, &LogData::rosout_callback, this);
 
   data_log_filename_ = data_log_folder + "log_Metacontrol_sim_";
   data_log_filename_ = data_log_filename_ + get_date(false);
@@ -197,7 +202,7 @@ energy_over_threshold_(0)
     ROS_INFO("[STOP SIM] Not Logging to .csv");
   }
 
-  
+
   inc_power_client = nh_.serviceClient<metacontrol_sim::IncreaseConsumptionFactor>("/increase_power_consumption");
   ROS_INFO("[STOP SIM] Node Initialization Completed");
 }
@@ -206,6 +211,21 @@ energy_over_threshold_(0)
 LogData::~LogData()
 {
    log_data_file_.flush();
+}
+
+void LogData::rosout_callback(const rosgraph_msgs::Log::ConstPtr& rosout_msg)
+{
+  if (rosout_msg->level == rosgraph_msgs::Log::ERROR)
+  {
+    
+    if(rosout_msg->name.compare("/reasoner") == 0)
+    {
+      errors_from_reasoner_.append(rosout_msg->msg);
+      // ROS_INFO("reasoner error %s", errors_from_reasoner_.c_str());
+    }
+
+  }
+
 }
 
 void LogData::robot_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg_rob_pose)
@@ -218,7 +238,7 @@ void LogData::power_load_callback(const std_msgs::Float32::ConstPtr& msg_power_l
 {
   power_load_ = msg_power_load->data;
 }
- 
+
 void LogData::odom_callback(const nav_msgs::Odometry::ConstPtr& msg_odom)
 {
   linear_vel_x_ = msg_odom->twist.twist.linear.x;
@@ -239,14 +259,14 @@ void LogData::diagnostics_callback(const diagnostic_msgs::DiagnosticArray::Const
   for (size_t i = msg_diagnostics->status.size() - 1; i != (size_t)-1; --i)
   {
     diagnostic_msgs::DiagnosticStatus tmp_diagnostic = msg_diagnostics->status[i];
-    
+
     if (tmp_diagnostic.message.compare(0, 2, "QA") == 0 )
     {
      // ROS_INFO("[LogData :: diagnostics_callback] - Message: %s", tmp_diagnostic.message.c_str());
       updateQA(tmp_diagnostic);
     }
   }
-  
+
   // qa_energy_ = msg_diagnostics->status
 }
 void LogData::updateQA(const diagnostic_msgs::DiagnosticStatus diagnostic_status)
@@ -265,7 +285,7 @@ void LogData::updateQA(const diagnostic_msgs::DiagnosticStatus diagnostic_status
     qa_obj_error_ = diagnostic_status.values[0].value;
   }
 }
-  
+
 void LogData::goal_result_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg_goal_result)
 {
   if(msg_goal_result->status.status == 3)
@@ -276,7 +296,7 @@ void LogData::goal_result_callback(const move_base_msgs::MoveBaseActionResult::C
   {
     goal_failed_counter_ ++;
   }
-  
+
 }
 void LogData::goal_callback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& msg_goal)
 {
@@ -392,7 +412,8 @@ bool LogData::write_log_header()
     log_data_file_ << "reconfig_time, ";
     log_data_file_ << "received_goals, ";
     log_data_file_ << "failed_goals, ";
-    log_data_file_ << "run_time ";
+    log_data_file_ << "run_time, ";
+    log_data_file_ << "reasoner_error_log";
     log_data_file_ << "\n";
     log_data_file_.close();
     return true;
@@ -411,7 +432,7 @@ void LogData::store_info()
       tmp_string = get_date(true) + std::string(", ");
       log_data_file_ << tmp_string.c_str();
 
-      
+
       // Robot_pose_x
       // Robot_pose_y
 
@@ -446,7 +467,7 @@ void LogData::store_info()
 
       double energy_numeric = ::atof(qa_energy_.c_str());
       double safety_numeric = ::atof(qa_safety_.c_str());
-      
+
       if (safety_numeric > safety_threshold_)
       {
         safety_over_threshold_ += 1;
@@ -455,7 +476,7 @@ void LogData::store_info()
       {
         safety_under_threshold_ +=1;
       }
-      
+
       if (energy_numeric > energy_threshold_)
       {
         energy_over_threshold_ += 1;
@@ -470,13 +491,18 @@ void LogData::store_info()
       sprintf(buffer, "%d, %d, %d, %d, ", safety_over_threshold_, safety_under_threshold_, energy_over_threshold_, energy_under_threshold_);
       tmp_string = buffer;
       log_data_file_ << tmp_string.c_str();
-      
-      
+
+
       // n reconfigurations failed goals
       tmp_string.clear();
-      sprintf(buffer, "%d, %.3f, %d, %d, %.3f",reconfig_counter_, reconfig_time_, goal_counter_, goal_failed_counter_, elapsed_time_);
+      sprintf(buffer, "%d, %.3f, %d, %d, %.3f, ",reconfig_counter_, reconfig_time_, goal_counter_, goal_failed_counter_, elapsed_time_);
       tmp_string = buffer;
       log_data_file_ << tmp_string.c_str();
+      
+      // Add error logs from reasoner
+      log_data_file_ << errors_from_reasoner_.c_str();
+      errors_from_reasoner_.clear();
+      
       log_data_file_ << "\n";
       log_data_file_.close();
     }
@@ -516,14 +542,14 @@ int main(int argc, char **argv){
 
   std::ofstream log_file;
   LogData log_data = LogData(log_file, nh, nh_private);
-  
+
   ROS_INFO("Initialized an async multi-thread node.");
   ros::AsyncSpinner async_spinner(4);  // Use 4 threads
-  
+
   async_spinner.start();
 
   ros::Rate loop_rate(10);
-  
+
   ROS_INFO("[STOP SIM] - Wait for goal msg");
   while (log_data.goal_pos_.x == 0)
   {
@@ -531,11 +557,11 @@ int main(int argc, char **argv){
     loop_rate.sleep();
   }
   log_data.store_info_timer_.start();
-  
+
   double first_distance = log_data.goal_distance ();
   ROS_INFO("[STOP SIM] - Initial goal distance: %.2f", first_distance);
   ROS_INFO("[STOP SIM] - Wait for robot to reach the goal");
-  
+
   while (ros::ok())
   {
     if (log_data.increase_power_)
@@ -559,11 +585,11 @@ int main(int argc, char **argv){
         log_data.increase_power_ = false;
       }
     }
-    if(log_data.elapsed_time_ >  240)  
+    if(log_data.elapsed_time_ >  240)
     {
       ROS_ERROR("240 seconds elapsed and no goal yet");
     }
-    
+
     if(log_data.goal_rached_)
     {
         log_data.store_info_timer_.stop();
