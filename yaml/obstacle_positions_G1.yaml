@@ -1,8 +1,8 @@
 O1:
   pose:
     position:
-      x: -6.7
-      y: 7.0
+      x: -5.5
+      y: 6.7
       z: 0.0
     orientation:
       x: 0.0
@@ -13,7 +13,7 @@ O2:
   pose:
     position:
       x: -5.5
-      y: 5.2
+      y: 5.3
       z: 0.0
     orientation:
       x: 0.0
@@ -23,7 +23,7 @@ O2:
 O3:
   pose:
     position:
-      x: -4.0
+      x: -5.5
       y: 6.0
       z: 0.0
     orientation:
