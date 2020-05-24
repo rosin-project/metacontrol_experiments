@@ -43,10 +43,10 @@ declare goal_position="2"
 declare launch_reconfiguration="false"
 
 ## nfr energy threshold ([0 - 1])
-declare nfr_energy="0.5"
+declare nfr_energy="0.7"
 
 ## nfr safety threshold ([0 - 1])
-declare nfr_safety="0.8"
+declare nfr_safety="0.4"
 
 ## Perturbations
 
@@ -80,9 +80,9 @@ while getopts ":i:g:n:r:o:p:e:s:" opt; do
     ;;
     p) increase_power="$OPTARG"
     ;;
-	e) nfr_energy="$OPTARG"
+    e) nfr_energy="$OPTARG"
     ;;
-	s) nfr_safety="$OPTARG"
+    s) nfr_safety="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG" >&2
     	usage
@@ -144,7 +144,6 @@ gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_W
 rosparam set /desired_configuration \"$nav_profile\";
 rosparam set /nfr_energy \"$nfr_energy\";
 rosparam set /nfr_safety \"$nfr_safety\";
-
 roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
