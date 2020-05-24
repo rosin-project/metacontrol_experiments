@@ -587,6 +587,7 @@ int main(int argc, char **argv){
     }
     if(log_data.elapsed_time_ >  240)
     {
+      if(log_data.elapsed_time_ <  250)
       ROS_ERROR("240 seconds elapsed and no goal yet");
     }
 

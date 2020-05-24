@@ -30,8 +30,12 @@ def spawn_unknown_obstacle(obstacle_name, obstacle_model_xml, obstacle_pose):
 def check_obstacle_existence(obstacle_name):
   # Service proxy to spawn urdf object in Gazebo.
   check_obstacle_service = rospy.ServiceProxy('/gazebo/get_model_properties', GetModelProperties)
-
-  check_obstacle_response = check_obstacle_service(obstacle_name)
+  try:
+    check_obstacle_response = check_obstacle_service(obstacle_name)
+  except rospy.ServiceException as e:
+    rospy.loginfo("Interrupt received when calling sevice: $s", str(e))
+    return False
+  
   return check_obstacle_response.success
 
 
