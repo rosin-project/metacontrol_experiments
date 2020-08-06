@@ -69,6 +69,10 @@
   <exec_depend>metacontrol_sim</exec_depend>
   <exec_depend>metacontrol_msgs</exec_depend>
   <exec_depend>rosgraph_msgs</exec_depend>
+  <exec_depend>map_server</exec_depend>
+  <exec_depend>fake_localization</exec_depend>
+  <exec_depend>laser_filters</exec_depend>
+
 
 
   <!-- The export tag contains other, unspecified, tags -->
