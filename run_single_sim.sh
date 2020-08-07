@@ -11,6 +11,7 @@
 	echo "          -b <record rosbags: ('true' / 'false')>"
 	echo "          -e <nfr energy threshold : ([0 - 1])>"
 	echo "          -s <nfr safety threshold : ([0 - 1])>"
+	echo "          -c <close reasoner terminal : ('true' / 'false')>"
 	exit 1
  }
 ## Define path for workspaces (needed to run reasoner and metacontrol_sim in different ws)
@@ -60,13 +61,16 @@ declare obstacles="3"
 declare increase_power="1.2"
 ###
 
+### Whether or not to close the reasoner terminal
+declare close_reasoner_terminal="true"
+
 if [ "$1" == "-h" ]
 then
 	usage
     exit 0
 fi
 
-while getopts ":i:g:n:r:o:p:e:s:" opt; do
+while getopts ":i:g:n:r:o:p:e:s:c:" opt; do
   case $opt in
     i) init_position="$OPTARG"
     ;;
@@ -83,6 +87,8 @@ while getopts ":i:g:n:r:o:p:e:s:" opt; do
     e) nfr_energy="$OPTARG"
     ;;
     s) nfr_safety="$OPTARG"
+    ;;
+	c) close_reasoner_terminal="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG" >&2
     	usage
@@ -103,10 +109,10 @@ wait_for_gzserver_to_end () {
 	do
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
-			echo "gzserver not running"
+			# echo " -- gzserver not running"
 			break
 		else
-			echo "gzserver still running"
+			echo " -- gzserver still running"
 		fi
 		sleep 1
 	done
@@ -123,6 +129,8 @@ kill_running_ros_nodes () {
 }
 
 
+echo "Make sure there is no other gazebo instances or ROS nodes running:"
+
 # Check that there are not running ros nodes
 kill_running_ros_nodes
 # If gazebo is running, it may take a while to end
@@ -133,8 +141,10 @@ declare init_pos_x=$(cat $METACONTROL_WS_PATH/src/metacontrol_experiments/yaml/i
 declare init_pos_y=$(cat $METACONTROL_WS_PATH/src/metacontrol_experiments/yaml/initial_positions.yaml | grep S$init_position -A 6 | tail -n 1 | cut -c 10-)
 
 cat $METACONTROL_WS_PATH/src/metacontrol_experiments/yaml/goal_positions.yaml | grep G$goal_position -A 12 | tail -n 12 > $METACONTROL_WS_PATH/src/metacontrol_sim/yaml/goal.yaml
-echo "Goal position: $goal_position - Initial position  $init_position - Navigation profile: $nav_profile"
 
+echo ""
+echo "Start a new simulation - Goal position: $goal_position - Initial position  $init_position - Navigation profile: $nav_profile"
+echo ""
 echo "Launch roscore"
 gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash; roscore; exit"
 #Sleep Needed to allow other launchers to recognize the roscore
@@ -152,7 +162,8 @@ if [ "$launch_reconfiguration" = true ] ; then
 	source $PYTHON3_VENV_PATH/devel/setup.bash;
 	source $REASONER_WS_PATH/devel/setup.bash;
 	roslaunch mros1_reasoner run.launch onto:=kb.owl;
-  sleep 20;
+	echo 'mros reasoner finished';
+	if [ '$close_reasoner_terminal' = false ] ; then read -rsn 1 -p 'Press any key to close this terminal...' echo; fi
 	exit"
 fi
 
