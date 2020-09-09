@@ -18,8 +18,6 @@
 ## You need to create a "config.sh file in the same folder defining your values for these variables"
 source config.sh
 export METACONTROL_WS_PATH
-export REASONER_WS_PATH
-export PYTHON3_VENV_PATH
 
 ####
 #  Default values, set if no parameters are given
