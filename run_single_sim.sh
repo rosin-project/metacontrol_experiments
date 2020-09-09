@@ -18,8 +18,6 @@
 ## You need to create a "config.sh file in the same folder defining your values for these variables"
 source config.sh
 export METACONTROL_WS_PATH
-export REASONER_WS_PATH
-export PYTHON3_VENV_PATH
 
 ####
 #  Default values, set if no parameters are given
@@ -158,10 +156,8 @@ roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
-	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $PYTHON3_VENV_PATH/venv3.6_ros/bin/activate;
-	source $PYTHON3_VENV_PATH/devel/setup.bash;
-	source $REASONER_WS_PATH/devel/setup.bash;
-	roslaunch mros1_reasoner run.launch onto:=kb.owl;
+	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
+	roslaunch mros1_reasoner run.launch onto:=$(rospack find mros1_reasoner)/scripts/kb.owl;
 	echo 'mros reasoner finished';
 	if [ '$close_reasoner_terminal' = false ] ; then read -rsn 1 -p 'Press any key to close this terminal...' echo; fi
 	exit"
