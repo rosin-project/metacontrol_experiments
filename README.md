@@ -43,7 +43,7 @@ If no parameters are given the first value is used byr default
 This launch should result in one or two reconfigurations
 
 ```console
-./run_single_sim.sh -p 1 -g 1 -n "f1_v2_r2" -o 2 -r "true" -p 1.7 -c "false"
+./run_single_sim.sh -i 1 -g 1 -n "f1_v2_r2" -o 2 -r "true" -p 1.7 -c "false"
 ```
 
 #### Expected outcome
@@ -57,7 +57,7 @@ The script opens three additional terminals and one rviz window
 The output of the main console (where the script is executed) should be like this
 
 ```console
-$ ./run_single_sim.sh -p 1 -g 1 -n "f1_v2_r2" -o 2 -r "true" -p 1.7 -c "false"
+$ ./run_single_sim.sh -i 1 -g 1 -n "f1_v2_r2" -o 2 -r "true" -p 1.7 -c "false"
 Make sure there is no other gazebo instances or ROS nodes running:
 kill -2 6644
 kill -2 6884
