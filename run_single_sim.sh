@@ -149,15 +149,12 @@ gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_W
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
 gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
-rosparam set /desired_configuration \"$nav_profile\";
-rosparam set /nfr_energy \"$nfr_energy\";
-rosparam set /nfr_safety \"$nfr_safety\";
 roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
 	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "source $METACONTROL_WS_PATH/devel/setup.bash;
-	roslaunch mros1_reasoner run.launch onto:=$(rospack find mros1_reasoner)/scripts/kb.owl;
+	roslaunch mros1_reasoner run.launch model:=$(rospack find mros1_reasoner)/scripts/kb.owl desired_configuration:=$nav_profile nfr_safety:=$nfr_safety nfr_energy:=$nfr_energy;
 	echo 'mros reasoner finished';
 	if [ '$close_reasoner_terminal' = false ] ; then read -rsn 1 -p 'Press any key to close this terminal...' echo; fi
 	exit"
