@@ -3,14 +3,34 @@
 
 This package runs and controls batch simulations of the [metacontrol_sim](https://github.com/rosin-project/metacontrol_sim) package, it can create contingencies that should result in reconfigurations of the navigation stack.
 
-## Setup using wstool
+## Installation
+
+### Install java jre
+
+The experiments use the [`mros_reasoner`](https://github.com/tud-cor/mc_mros_reasoner) for the reconfiguration, and to run this a java jre is required.
+
+You can use this command To install the Java Vitual Machine.
+
+```console
+sudo apt-get install openjdk-11-jre
+```
+
+### Create metacontrol_ws
+
+- We recommend you to create a workspace only for `metacontrol_ws`, for example:
+
+```console
+  mkdir -p ~/metacontrol_ws/src
+  cd metacontrol_ws
+```
+
+### Setup all dependencies using wstool
 
 **Note** This step will include all the necessary packages, including those listed in the [metacontrol_sim](https://github.com/rosin-project/metacontrol_sim) package. Please make sure you're not duplicating them.
 
 In the following instructions, we assume that the ROS workspace is called `metacontrol_ws`, but you can give it any name you want.
 
 ```console
-mkdir -p ~/metacontrol_ws/src
 cd ~/metacontrol_ws
 wstool init src https://raw.githubusercontent.com/rosin-project/metacontrol_experiments/master/metacontrol_experiments.rosinstall
 rosdep install --from-paths ./src -y -i -r --skip-keys="abb_rws_interface"
@@ -26,19 +46,6 @@ The code can be built using the standard `catkin build` process.
 cd ~/metacontrol_ws
 source /opt/ros/melodic/setup.bash
 catkin build
-source devel/setup.bash
-```
-
-## WS Path  variables
-
-To run the scripts, you need to create a file named `config.sh`, in the same folder as the `run.sh` defining your values for the workspace path variable
-
-An example, if you are using the same workspace names as above, would be:
-
-```bash
-#!/bin/bash
-
-METACONTROL_WS_PATH=~/metacontrol_ws
 ```
 
 ## Run the scripts
@@ -46,9 +53,8 @@ METACONTROL_WS_PATH=~/metacontrol_ws
 There are several scripts, to run a single simulation or to run simulations on a batch.
 
 - `run_single_sim.sh` : Main script, runs a full simulation on a single terminal, the parameter are listed below.
-- `run_single_sim_desktop.sh` : Runs a full simulation, but launches three different terminals. Accepts the same parameters as `run_single_sim.sh` Runs a single simulation on a single terminal.
-  - **Note** gnome-terminal needs to be installed for this script to run.
-- `run_batch_sim.sh` and  `run_combined_test.sh`: Both are used to run a batch of simulations, they uses the `run_single_sim` script whit different configurations at every time.
+- `run_single_sim_desktop.sh` : Runs a full simulation, but launches three different terminals. Accepts the same parameters as `run_single_sim.sh` Runs a single simulation on a single terminal. **Note:** gnome-terminal needs to be installed for this script to run.
+- `run_batch_sim.sh` and  `run_combined_test.sh`: Both are used to run a batch of simulations, they use the `run_single_sim` script whit different configurations at every time.
 
 ### Parameters for a single simulation run
 
@@ -68,13 +74,15 @@ The `run_single_sim.sh` and  `run_single_sim_desktop.sh` scripts accept the foll
 -c <close reasoner terminal after execution : ('true' / 'false')>"
 ```
 
-If no parameters are given the first value is used byr default
+If no parameters are given the first value is used by default
 
-#### Example of single run
+### Example of single run
 
 This launch should result in one or two reconfigurations
 
 ```console
+source ~/metacontrol_ws/devel/setup.bash
+roscd metacontrol_experiments
 ./run_single_sim_desktop.sh -i 1 -g 1 -n "f1_v2_r2" -o 2 -r "true" -p 1.7 -c "false"
 ```
 
