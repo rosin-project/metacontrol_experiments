@@ -11,6 +11,7 @@
 	echo "          -b <record rosbags: ('true' / 'false')>"
 	echo "          -e <nfr energy threshold : ([0 - 1])>"
 	echo "          -s <nfr safety threshold : ([0 - 1])>"
+	echo "          -l <log frequency : [0 -10]) - If 0, no logs will be recorded>"
 	echo "          -c <close reasoner terminal : ('true' / 'false')>"
 	exit 1
  }
@@ -72,6 +73,12 @@ declare obstacles="3"
 declare increase_power="1.2"
 ###
 
+## Modify log frequency
+## Frequency at wich log files are stored
+# Possible values (0: no logs. Any value larger than 0, will be the log frequency)
+declare log_frequency="0.0"
+###
+
 ### Whether or not to close the reasoner terminal
 declare close_reasoner_terminal="true"
 
@@ -98,6 +105,8 @@ while getopts ":i:g:n:r:o:p:e:s:c:" opt; do
     e) nfr_energy="$OPTARG"
     ;;
     s) nfr_safety="$OPTARG"
+	;;
+	l) log_frequency="$OPTARG"
     ;;
 	c) close_reasoner_terminal="$OPTARG"
     ;;
@@ -175,7 +184,7 @@ fi
 
 echo "Running log and stop simulation node"
 bash -ic "source $METACONTROL_WS_PATH/devel/setup.bash;
-roslaunch metacontrol_experiments stop_simulation.launch obstacles:=$obstacles goal_nr:=$goal_position increase_power:=$increase_power record_bags:=$record_rosbags;
+roslaunch metacontrol_experiments stop_simulation.launch store_data_freq:=$log_frequency obstacles:=$obstacles goal_nr:=$goal_position increase_power:=$increase_power record_bags:=$record_rosbags;
 exit "
 echo "Simulation Finished!!"
 
