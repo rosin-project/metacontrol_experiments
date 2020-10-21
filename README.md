@@ -43,11 +43,16 @@ METACONTROL_WS_PATH=~/metacontrol_ws
 
 ## Run the scripts
 
-There are two scripts, one to run a single simulation and another to run simulations on a batch.
+There are several scripts, to run a single simulation or to run simulations on a batch.
 
-### Run a single simulation
+- `run_single_sim.sh` : Main script, runs a full simulation on a single terminal, the parameter are listed below.
+- `run_single_sim_desktop.sh` : Runs a full simulation, but launches three different terminals. Accepts the same parameters as `run_single_sim.sh` Runs a single simulation on a single terminal.
+  - **Note** gnome-terminal needs to be installed for this script to run.
+- `run_batch_sim.sh` and  `run_combined_test.sh`: Both are used to run a batch of simulations, they uses the `run_single_sim` script whit different configurations at every time.
 
-The ./run_single_sim.sh accepts the following parameters
+### Parameters for a single simulation run
+
+The `run_single_sim.sh` and  `run_single_sim_desktop.sh` scripts accept the following parameters:
 
 ```bash
 -i <init_position: (1 / 2 / 3)>
@@ -59,6 +64,7 @@ The ./run_single_sim.sh accepts the following parameters
 -b <record rosbags: ("true" / "false")>
 -e <nfr energy threshold : ([0 - 1])>
 -s <nfr safety threshold : ([0 - 1])>
+-l <.csv log frequency : [0 - 10])  - 0 Means no .csv logs will be recorded>
 -c <close reasoner terminal after execution : ('true' / 'false')>"
 ```
 
@@ -69,7 +75,7 @@ If no parameters are given the first value is used byr default
 This launch should result in one or two reconfigurations
 
 ```console
-./run_single_sim.sh -i 1 -g 1 -n "f1_v2_r2" -o 2 -r "true" -p 1.7 -c "false"
+./run_single_sim_desktop.sh -i 1 -g 1 -n "f1_v2_r2" -o 2 -r "true" -p 1.7 -c "false"
 ```
 
 #### Expected outcome
