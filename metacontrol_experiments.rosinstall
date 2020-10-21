@@ -1,9 +1,7 @@
 - git:
     local-name: metacontrol_sim
     uri: https://github.com/rosin-project/metacontrol_sim
-- git:
-    local-name: yumi
-    uri: https://github.com/marioney/yumi
+    version: no-yumi
 - git:
     local-name: metacontrol_nav
     uri: https://github.com/rosin-project/metacontrol_nav

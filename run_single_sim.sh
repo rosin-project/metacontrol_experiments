@@ -22,7 +22,7 @@ if [ ! -f config.sh ]; then
 	echo "You need to create a file named config.sh in the same folder as this script whit the path to your workspace: "
 	echo "The content should be like this: "
 	echo " "
-	echo "echo#!/bin/bash"
+	echo "#!/bin/bash"
 	echo "METACONTROL_WS_PATH=/path/to/your/metacontrol_ws"
 	echo " "
 	exit
