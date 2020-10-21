@@ -1,23 +1,49 @@
 
 # metacontrol_experiments
 
-Controls simulation for metacontrol_sim
+This package runs and controls batch simulations of the [metacontrol_sim](https://github.com/rosin-project/metacontrol_sim) package, it can create contingencies that should result in reconfigurations of the navigation stack.
+
+## Setup using wstool
+
+**Note** This step will include all the necessary packages, including those listed in the [metacontrol_sim](https://github.com/rosin-project/metacontrol_sim) package. Please make sure you're not duplicating them.
+
+In the following instructions, we assume that the ROS workspace is called `metacontrol_ws`, but you can give it any name you want.
+
+```console
+mkdir -p ~/metacontrol_ws/src
+cd ~/metacontrol_ws
+wstool init src https://raw.githubusercontent.com/rosin-project/metacontrol_experiments/master/metacontrol_experiments.rosinstall
+rosdep install --from-paths ./src -y -i -r --skip-keys="abb_rws_interface"
+```
+
+Check that all dependencies are installed correctly, please make an issue if you find any errors.
+
+## Build the code
+
+The code can be built using the standard `catkin build` process.
+
+```console
+cd ~/metacontrol_ws
+source /opt/ros/melodic/setup.bash
+catkin build
+source devel/setup.bash
+```
 
 ## WS Path  variables
 
-create a `config.sh` file in the same folder as the `run.sh` defining your values for the workspace path variable
+To run the scripts, you need to create a file named `config.sh`, in the same folder as the `run.sh` defining your values for the workspace path variable
 
-An example would be:
+An example, if you are using the same workspace names as above, would be:
 
 ```bash
 #!/bin/bash
 
-METACONTROL_WS_PATH=/path/to/your/mros1_reasoner_ws
+METACONTROL_WS_PATH=~/metacontrol_ws
 ```
 
 ## Run the scripts
 
-There are two scripts, one to run a single simulation and another to run a batch.
+There are two scripts, one to run a single simulation and another to run simulations on a batch.
 
 ### Run a single simulation
 
