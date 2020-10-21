@@ -1,0 +1,40 @@
+- git:
+    local-name: metacontrol_sim
+    uri: https://github.com/rosin-project/metacontrol_sim
+- git:
+    local-name: yumi
+    uri: https://github.com/marioney/yumi
+- git:
+    local-name: metacontrol_nav
+    uri: https://github.com/rosin-project/metacontrol_nav
+- git:
+    local-name: brass_gazebo_battery
+    uri: https://github.com/rosin-project/brass_gazebo_battery.git
+- git:
+    local-name: metacontrol_msgs
+    uri: https://github.com/rosin-project/metacontrol_msgs
+- git:
+    local-name: rosgraph_monitor
+    uri: https://github.com/rosin-project/rosgraph_monitor
+    version: observers
+- git:
+    local-name: ros_graph_parser
+    uri: https://github.com/ipa-nhg/ros_graph_parser
+    version: SoSymPaper
+- git:
+    local-name: metacontrol_move_base_configurations
+    uri: https://github.com/rosin-project/metacontrol_move_base_configurations
+- git:
+    local-name: mros1_reasoner
+    uri: https://github.com/tud-cor/mc_mros_reasoner.git
+    version: master
+- git:
+    local-name: metacontrol_msgs
+    uri: https://github.com/rosin-project/metacontrol_msgs
+- git:
+    local-name: mc_mdl_tomasys
+    uri: https://github.com/tud-cor/mc_mdl_tomasys.git
+    version: v0.1
+- git:
+    local-name: metacontrol_experiments
+    uri: https://github.com/rosin-project/metacontrol_experiments.git
