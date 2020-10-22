@@ -16,23 +16,6 @@
 	exit 1
  }
 
-## Define path for workspaces (needed to run reasoner and metacontrol_sim in different ws)
-## You need to create a "config.sh file in the same folder defining your values for these variables"
-if [ ! -f config.sh ]; then
-    echo "config.sh File not found!"
-	echo "You need to create a file named config.sh in the same folder as this script whit the path to your workspace: "
-	echo "The content should be like this: "
-	echo " "
-	echo "#!/bin/bash"
-	echo "METACONTROL_WS_PATH=/path/to/your/metacontrol_ws"
-	echo " "
-	exit
-
-fi
-
-source config.sh
-export METACONTROL_WS_PATH
-
 ####
 #  Default values, set if no parameters are given
 ####
@@ -152,7 +135,7 @@ kill_running_ros_nodes () {
 echo "Make sure there is no other gazebo instances or ROS nodes running:"
 
 # Check that there are not running ros nodes
-#kill_running_ros_nodes
+kill_running_ros_nodes
 # If gazebo is running, it may take a while to end
 wait_for_gzserver_to_end
 
