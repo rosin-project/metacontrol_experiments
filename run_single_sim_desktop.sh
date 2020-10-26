@@ -143,7 +143,10 @@ wait_for_gzserver_to_end
 declare init_pos_x=$(cat $(rospack find metacontrol_experiments)/yaml/initial_positions.yaml | grep S$init_position -A 5 | tail -n 1 | cut -c 10-)
 declare init_pos_y=$(cat $(rospack find metacontrol_experiments)/yaml/initial_positions.yaml | grep S$init_position -A 6 | tail -n 1 | cut -c 10-)
 
-cat $(rospack find metacontrol_experiments)/yaml/goal_positions.yaml | grep G$goal_position -A 12 | tail -n 12 > $(rospack find metacontrol_sim)/yaml/goal.yaml
+tmpfile=$(mktemp /tmp/current_goal_yaml.XXXXX)
+
+#cat $(rospack find metacontrol_experiments)/yaml/goal_positions.yaml | grep G$goal_position -A 12 | tail -n 12 > $(rospack find metacontrol_sim)/yaml/goal.yaml
+cat $(rospack find metacontrol_experiments)/yaml/goal_positions.yaml | grep G$goal_position -A 12 | tail -n 12 > $tmpfile
 
 echo ""
 echo "Start a new simulation - Goal position: $goal_position - Initial position  $init_position - Navigation profile: $nav_profile"
@@ -154,7 +157,7 @@ gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roscore; exit"
 #Sleep Needed to allow other launchers to recognize the roscore
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
-gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
+gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch current_goal_file:=$tmpfile nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
@@ -168,6 +171,9 @@ echo "Running log and stop simulation node"
 bash -ic "roslaunch metacontrol_experiments stop_simulation.launch store_data_freq:=$log_frequency obstacles:=$obstacles goal_nr:=$goal_position increase_power:=$increase_power record_bags:=$record_rosbags;
 exit "
 echo "Simulation Finished!!"
+
+# Delete temporary yaml goal file
+rm "$tmpfile"
 
 # Check that there are not running ros nodes
 kill_running_ros_nodes
