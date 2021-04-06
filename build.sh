@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+sudo apt-get update
 sudo apt-get install openjdk-11-jre
 mkdir -p ~/metacontrol_ws/src
 cd ~/metacontrol_ws
