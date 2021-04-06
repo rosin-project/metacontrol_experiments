@@ -166,7 +166,7 @@ echo "Start a new simulation - Goal position: $goal_position - Initial position 
 echo ""
 echo "Launch roscore"
 
-gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roscore; exit"
+bash -c "roscore; exit"
 #Sleep Needed to allow other launchers to recognize the roscore
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
