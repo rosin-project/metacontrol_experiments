@@ -2,7 +2,7 @@
 set -e
 
 sudo apt-get update
-sudo apt-get install openjdk-11-jre
+sudo apt-get install -y openjdk-11-jre
 mkdir -p ~/metacontrol_ws/src
 cd ~/metacontrol_ws
 wstool init src https://raw.githubusercontent.com/rosin-project/metacontrol_experiments/master/metacontrol_experiments.rosinstall
