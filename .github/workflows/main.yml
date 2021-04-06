@@ -24,6 +24,6 @@ jobs:
       - name: Build workspace
         run: |
           bash ./build.sh
-      # - name: Run experiments
-      #   run: |
-      #     bash ./test_bridge.sh
+      - name: Run experiments
+        run: |
+          bash ./run_experiments.sh
