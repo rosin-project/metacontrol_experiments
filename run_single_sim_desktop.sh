@@ -25,7 +25,7 @@
 # also any of the fx_vX_rX metacontrol configurations
 #declare nav_profile="fast"
 #declare nav_profile="safe"
-declare nav_profile="f3_v2_r2"
+declare nav_profile="f3_v3_r1"
 
 ## Define initial position
 # Possible values (1, 2, 3)
@@ -39,10 +39,10 @@ declare goal_position="1"
 declare launch_reconfiguration="true"
 
 ## nfr energy threshold ([0 - 1])
-declare nfr_energy="0.65"
+declare nfr_energy="0.99"
 
 ## nfr safety threshold ([0 - 1])
-declare nfr_safety="0.4"
+declare nfr_safety="0.9"
 
 ## Perturbations
 
@@ -59,11 +59,11 @@ declare increase_power="1.5"
 ## Modify log frequency
 ## Frequency at wich log files are stored
 # Possible values (0: no logs. Any value larger than 0, will be the log frequency)
-declare log_frequency="0.0"
+declare log_frequency="1.0"
 ###
 
 ### Whether or not to close the reasoner terminal
-declare close_reasoner_terminal="true"
+declare close_reasoner_terminal="false"
 
 if [ "$1" == "-h" ]
 then
@@ -157,11 +157,11 @@ gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roscore; exit"
 #Sleep Needed to allow other launchers to recognize the roscore
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
-gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch current_goal_file:=$tmpfile nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
+gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile current_goal_file:=$tmpfile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
-	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch mros1_reasoner run.launch model:=$(rospack find mros1_reasoner)/scripts/kb.owl desired_configuration:=$nav_profile nfr_safety:=$nfr_safety nfr_energy:=$nfr_energy;
+	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch mros1_reasoner run.launch desired_configuration:=$nav_profile desired_configuration:=$nav_profile nfr_safety:=$nfr_safety nfr_energy:=$nfr_energy;
 	echo 'mros reasoner finished';
 	if [ '$close_reasoner_terminal' = false ] ; then read -rsn 1 -p 'Press any key to close this terminal...' echo; fi
 	exit"

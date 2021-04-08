@@ -13,6 +13,7 @@
 	echo "          -s <nfr safety threshold : ([0 - 1])>"
 	echo "          -l <log frequency : [0 -10]) - If 0, no logs will be recorded>"
 	echo "          -c <close reasoner terminal : ('true' / 'false')>"
+	echo "          -c <Run RVIZ : ('true' / 'false')>"
 	exit 1
  }
 
@@ -25,7 +26,7 @@
 # also any of the fx_vX_rX metacontrol configurations
 #declare nav_profile="fast"
 #declare nav_profile="safe"
-declare nav_profile="f3_v2_r2"
+declare nav_profile="f1_v3_r1"
 
 ## Define initial position
 # Possible values (1, 2, 3)
@@ -42,7 +43,7 @@ declare launch_reconfiguration="true"
 declare nfr_energy="0.65"
 
 ## nfr safety threshold ([0 - 1])
-declare nfr_safety="0.4"
+declare nfr_safety="0.6"
 
 ## Perturbations
 
@@ -65,13 +66,16 @@ declare log_frequency="0.0"
 ### Whether or not to close the reasoner terminal
 declare close_reasoner_terminal="true"
 
+### Whether or not to launch RVIZ
+declare rviz="false"
+
 if [ "$1" == "-h" ]
 then
 	usage
     exit 0
 fi
 
-while getopts ":i:g:n:r:o:p:e:s:c:" opt; do
+while getopts ":i:g:n:r:o:p:e:s:c:v:" opt; do
   case $opt in
     i) init_position="$OPTARG"
     ;;
@@ -92,6 +96,8 @@ while getopts ":i:g:n:r:o:p:e:s:c:" opt; do
 	l) log_frequency="$OPTARG"
     ;;
 	c) close_reasoner_terminal="$OPTARG"
+    ;;
+	v) rviz="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG" >&2
     	usage
@@ -157,11 +163,11 @@ bash -c "roscore; exit" &
 sleep 3
 rosparam set /
 echo "Launching: MVP metacontrol world.launch"
-bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch current_goal_file:=$tmpfile nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
+bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch current_goal_file:=$tmpfile nav_profile:=$nav_profile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y rviz:=$rviz;
 exit" &
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
-	bash -c "roslaunch mros1_reasoner run.launch model:=$(rospack find mros1_reasoner)/scripts/kb.owl desired_configuration:=$nav_profile nfr_safety:=$nfr_safety nfr_energy:=$nfr_energy;
+	bash -c "roslaunch mros1_reasoner run.launch desired_configuration:=$nav_profile nfr_safety:=$nfr_safety nfr_energy:=$nfr_energy;
 	echo 'mros reasoner finished';
 	if [ '$close_reasoner_terminal' = false ] ; then read -rsn 1 -p 'Press any key to close this terminal...' echo; fi
 	exit" &
@@ -178,4 +184,4 @@ rm "$tmpfile"
 # Check that there are not running ros nodes
 kill_running_ros_nodes
 # Wait for gazebo to end
-# wait_for_gzserver_to_end
+wait_for_gzserver_to_end
