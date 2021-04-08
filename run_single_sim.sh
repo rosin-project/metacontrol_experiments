@@ -13,7 +13,7 @@
 	echo "          -s <nfr safety threshold : ([0 - 1])>"
 	echo "          -l <log frequency : [0 -10]) - If 0, no logs will be recorded>"
 	echo "          -c <close reasoner terminal : ('true' / 'false')>"
-	echo "          -c <Run RVIZ : ('true' / 'false')>"
+	echo "          -v <Run RVIZ : ('true' / 'false')>"
 	exit 1
  }
 

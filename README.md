@@ -71,7 +71,8 @@ The `run_single_sim.sh` and  `run_single_sim_desktop.sh` scripts accept the foll
 -e <nfr energy threshold : ([0 - 1])>
 -s <nfr safety threshold : ([0 - 1])>
 -l <.csv log frequency : [0 - 10])  - 0 Means no .csv logs will be recorded>
--c <close reasoner terminal after execution : ('true' / 'false')>"
+-c <close reasoner terminal after execution : ("true" / "false")>
+-v <Run RVIZ : ("false" / "true" )>
 ```
 
 If no parameters are given the first value is used by default
