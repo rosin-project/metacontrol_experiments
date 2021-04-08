@@ -5,6 +5,7 @@
 - git:
     local-name: metacontrol_nav
     uri: https://github.com/rosin-project/metacontrol_nav
+    version: master
 - git:
     local-name: brass_gazebo_battery
     uri: https://github.com/rosin-project/brass_gazebo_battery.git
@@ -14,7 +15,7 @@
 - git:
     local-name: rosgraph_monitor
     uri: https://github.com/rosin-project/rosgraph_monitor
-    version: observers
+    version: safety_observer
 - git:
     local-name: ros_graph_parser
     uri: https://github.com/ipa-nhg/ros_graph_parser
@@ -22,6 +23,7 @@
 - git:
     local-name: metacontrol_move_base_configurations
     uri: https://github.com/rosin-project/metacontrol_move_base_configurations
+    version: master
 - git:
     local-name: mros1_reasoner
     uri: https://github.com/tud-cor/mc_mros_reasoner.git
@@ -29,10 +31,16 @@
 - git:
     local-name: metacontrol_msgs
     uri: https://github.com/rosin-project/metacontrol_msgs
+    version: master
 - git:
     local-name: mc_mdl_tomasys
     uri: https://github.com/tud-cor/mc_mdl_tomasys.git
-    version: v0.1
+    version: master
 - git:
     local-name: metacontrol_experiments
     uri: https://github.com/rosin-project/metacontrol_experiments.git
+    version: master
+- git:
+    local-name: mc_rosgraph_manipulator
+    uri: https://github.com/tud-cor/mc_rosgraph_manipulator.git
+    version: master

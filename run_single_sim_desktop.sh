@@ -39,10 +39,10 @@ declare goal_position="1"
 declare launch_reconfiguration="true"
 
 ## nfr energy threshold ([0 - 1])
-declare nfr_energy="0.99"
+declare nfr_energy="0.65"
 
 ## nfr safety threshold ([0 - 1])
-declare nfr_safety="0.9"
+declare nfr_safety="0.65"
 
 ## Perturbations
 
