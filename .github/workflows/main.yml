@@ -24,7 +24,7 @@ jobs:
             ccache-${{ matrix.distro }}
       - name: Build workspace
         run: |
-          bash ./build.sh ${{ matrix.config }}
+          bash ./build.sh
       - name: Run experiments
         run: |
           bash ./run_experiments.sh ${{ matrix.config }}
