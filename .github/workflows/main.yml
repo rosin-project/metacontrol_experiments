@@ -28,11 +28,8 @@ jobs:
       - name: Run experiments
         run: |
           bash ./run_experiments.sh ${{ matrix.config }}
-          find . -name "*data*"
-          find . -name "*.csv"
-          pwd
       - name: 'Upload log artifact'
         uses: actions/upload-artifact@v2
         with:
           name: log-artifact
-          path: ${{ github.workspace }}/data
+          path: /github/home/metacontrol_ws/src/metacontrol_experiments/data
