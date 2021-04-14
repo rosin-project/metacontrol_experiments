@@ -75,7 +75,7 @@ then
     exit 0
 fi
 
-while getopts ":i:g:n:r:o:p:e:s:c:v:" opt; do
+while getopts ":i:g:n:r:o:p:e:s:c:v:l:" opt; do
   case $opt in
     i) init_position="$OPTARG"
     ;;
