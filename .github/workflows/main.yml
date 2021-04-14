@@ -24,7 +24,16 @@ jobs:
             ccache-${{ matrix.distro }}
       - name: Build workspace
         run: |
-          bash ./build.sh
-      - name: Run experiments
-        run: |
-          bash ./run_experiments.sh ${{ matrix.config }}
+          echo ${{ github.worspace }}
+          echo $GITHUB_WORSPACE
+          find . -name "*data*"
+      # bash ./build.sh
+      # - name: Run experiments
+      #   run: |
+      #     bash ./run_experiments.sh ${{ matrix.config }}
+      # - name: 'Upload Artifact'
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: my-artifact
+      #     path: my_file.txt
+      # /github/home/metacontrol_ws/src/metacontrol_experiments/data/log_Metacontrol_sim_14-07_58_24.csv
