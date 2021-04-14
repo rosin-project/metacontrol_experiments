@@ -13,6 +13,9 @@
 	echo "          -s <nfr safety threshold : ([0 - 1])>"
 	echo "          -l <log frequency : [0 -10]) - If 0, no logs will be recorded>"
 	echo "          -c <close reasoner terminal : ('true' / 'false')>"
+	echo "          -v <Run RVIZ : ('true' / 'false')>"
+	echo "          -k <laser error component : ('true' / 'false')>"
+
 	exit 1
  }
 
@@ -65,13 +68,19 @@ declare log_frequency="1.0"
 ### Whether or not to close the reasoner terminal
 declare close_reasoner_terminal="false"
 
+### Whether or not to launch RVIZ
+declare rviz="false"
+
+### Whether or not to launch RVIZ
+declare laser_error="false"
+
 if [ "$1" == "-h" ]
 then
 	usage
     exit 0
 fi
 
-while getopts ":i:g:n:r:o:p:e:s:c:" opt; do
+while getopts ":i:g:n:r:o:p:e:s:c:v:l:k:" opt; do
   case $opt in
     i) init_position="$OPTARG"
     ;;
@@ -92,6 +101,10 @@ while getopts ":i:g:n:r:o:p:e:s:c:" opt; do
 	l) log_frequency="$OPTARG"
     ;;
 	c) close_reasoner_terminal="$OPTARG"
+    ;;
+	v) rviz="$OPTARG"
+    ;;
+	k) laser_error="$OPTARG"
     ;;
     \?) echo "Invalid option -$OPTARG" >&2
     	usage
@@ -157,18 +170,34 @@ gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roscore; exit"
 #Sleep Needed to allow other launchers to recognize the roscore
 sleep 3
 echo "Launching: MVP metacontrol world.launch"
-gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch nav_profile:=$nav_profile current_goal_file:=$tmpfile initial_pose_x:=$init_pos_x initial_pose_y:=$init_pos_y;
+gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch \
+                                                           metacontrol_sim MVP_metacontrol_world.launch \
+														   nav_profile:=$nav_profile \
+														   current_goal_file:=$tmpfile \
+														   initial_pose_x:=$init_pos_x \
+														   initial_pose_y:=$init_pos_y;
 exit"
 if [ "$launch_reconfiguration" = true ] ; then
 	echo "Launching: mros reasoner"
-	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch mros1_reasoner run.launch desired_configuration:=$nav_profile desired_configuration:=$nav_profile nfr_safety:=$nfr_safety nfr_energy:=$nfr_energy;
+	gnome-terminal --window --geometry=80x24+10+10 -- bash -c "roslaunch \
+	                                                           mros1_reasoner run.launch \
+															   desired_configuration:=$nav_profile \
+															   desired_configuration:=$nav_profile \
+															   nfr_safety:=$nfr_safety \
+															   nfr_energy:=$nfr_energy;
 	echo 'mros reasoner finished';
 	if [ '$close_reasoner_terminal' = false ] ; then read -rsn 1 -p 'Press any key to close this terminal...' echo; fi
 	exit"
 fi
 
 echo "Running log and stop simulation node"
-bash -ic "roslaunch metacontrol_experiments stop_simulation.launch store_data_freq:=$log_frequency obstacles:=$obstacles goal_nr:=$goal_position increase_power:=$increase_power record_bags:=$record_rosbags;
+bash -ic "roslaunch metacontrol_experiments stop_simulation.launch \
+		  store_data_freq:=$log_frequency \
+		  obstacles:=$obstacles \
+		  goal_nr:=$goal_position \
+		  increase_power:=$increase_power \
+		  record_bags:=$record_rosbags \
+		  send_laser_error:=$laser_error;
 exit "
 echo "Simulation Finished!!"
 

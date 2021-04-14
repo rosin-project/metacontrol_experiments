@@ -38,6 +38,8 @@ private:
   ros::Subscriber sub_goal_;
   ros::Subscriber reconfig_goal_;
   ros::Subscriber rosout_sub_;
+  ros::Publisher pub_diagnostics_;
+
 public:
   LogData(std::ofstream& log_file,
           const ros::NodeHandle &node_handle,
@@ -64,6 +66,7 @@ public:
   int goal_failed_counter_;
   bool goal_rached_;
   bool increase_power_;
+  bool send_laser_error_;
   float increase_power_factor_;
   ros::Time init_time_;
   ros::Time reconfig_init_time_;
@@ -79,10 +82,6 @@ public:
 
   std::string errors_from_reasoner_;
 
-
-
-
-
   void robot_pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg_rob_pose);
   void power_load_callback(const std_msgs::Float32::ConstPtr& msg_power_load);
   void odom_callback(const nav_msgs::Odometry::ConstPtr& msg_odom);
@@ -93,6 +92,7 @@ public:
   void goal_callback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& msg_goal);
   void reconfig_callback(const metacontrol_msgs::MvpReconfigurationActionGoal::ConstPtr& reconfig_goal);
   void rosout_callback(const rosgraph_msgs::Log::ConstPtr& rosout_msg);
+  void publish_error_laser();
 
   // Stops simulation by killing a required node
   void stop_simulation();
@@ -130,6 +130,7 @@ max_run_time_(500),
 elapsed_time_(0),
 goal_rached_(false),
 increase_power_(false),
+send_laser_error_(false),
 increase_power_factor_(0.0),
 safety_under_threshold_(0),
 energy_under_threshold_(0),
@@ -145,25 +146,32 @@ energy_over_threshold_(0)
   double max_run_time;
   double energy_threshold;
   double safety_threshold;
+  bool send_laser_error;
 
   log_data_file_ = std::ofstream();
 
   nh_private_.param("data_log_folder", data_log_folder, ros::package::getPath("metacontrol_experiments") + std::string("/data/"));
   nh_private_.param("store_data_freq", store_log_freq, 1.0);
   nh_private_.param("increase_power_factor", increase_power_factor, 0.0);
+  nh_private_.param("send_laser_error", send_laser_error, false);
   nh_private_.param("max_run_time", max_run_time, 500.0);
   nh_.param("/nfr_energy", energy_threshold, 0.5);
   nh_.param("/nfr_safety", safety_threshold, 0.8);
   nh_private_.param("max_run_time", max_run_time, 500.0);
 
-
-  if (increase_power_factor > 0)
+  if (send_laser_error)
+  {
+    ROS_INFO("[STOP SIM] Will send laser error message after 0.6 of the path is completed");
+    send_laser_error_ = true;
+  }
+  else if (increase_power_factor > 0)
   {
     ROS_INFO("[STOP SIM] Will increase power consumption by %.2f after 0.6 of the path is completed", increase_power_factor);
     increase_power_factor_ = increase_power_factor;
     increase_power_ = true;
   }
-
+  
+  
   max_run_time_ = max_run_time;
   energy_threshold_ = energy_threshold;
   safety_threshold_ = safety_threshold;
@@ -178,6 +186,7 @@ energy_over_threshold_(0)
   sub_goal_ = nh_.subscribe("/move_base/goal", 1, &LogData::goal_callback, this);
   reconfig_goal_ = nh_.subscribe("/rosgraph_manipulator_action_server/goal", 1, &LogData::reconfig_callback, this);
   rosout_sub_ = nh_.subscribe("/rosout", 1, &LogData::rosout_callback, this);
+  pub_diagnostics_ = nh_.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
 
   data_log_filename_ = data_log_folder + "log_Metacontrol_sim_";
   data_log_filename_ = data_log_filename_ + get_date(false);
@@ -332,6 +341,26 @@ void LogData::stop_simulation()
 double LogData::goal_distance ()
 {
   return point_distance(rob_pos_, goal_pos_);
+}
+void LogData::publish_error_laser()
+{
+  diagnostic_msgs::DiagnosticArray diag_array;
+  diag_array.header.stamp = ros::Time::now();
+
+  diagnostic_msgs::DiagnosticStatus diag_state;
+  
+  diag_state.name = "error_laser";
+  diag_state.level = diagnostic_msgs::DiagnosticStatus::ERROR;
+  diag_state.message = "Component status";
+  diagnostic_msgs::KeyValue laser_error_key;
+  laser_error_key.key = "laser_resender";
+  laser_error_key.value = "FALSE";
+
+  diag_state.values.push_back(laser_error_key);
+  diag_array.status.push_back(diag_state);
+  diag_array.header.stamp = ros::Time::now();
+  pub_diagnostics_.publish(diag_array);
+
 }
 
 double LogData::point_distance (const geometry_msgs::Point point_1, const geometry_msgs::Point point_2)
@@ -564,7 +593,7 @@ int main(int argc, char **argv){
 
   while (ros::ok())
   {
-    if (log_data.increase_power_)
+    if (log_data.increase_power_ || log_data.send_laser_error_)
     {
       double distance;
       distance = log_data.goal_distance ();
@@ -572,17 +601,26 @@ int main(int argc, char **argv){
       if (((first_distance - distance) / first_distance ) > 0.6)
       {
         ROS_INFO("[STOP SIM] - 2 / 3 of the route completed");
-        metacontrol_sim::IncreaseConsumptionFactor increase_srv;
-        increase_srv.request.increase_consumption = log_data.increase_power_factor_;
-        if (log_data.inc_power_client.call(increase_srv))
+        if (log_data.increase_power_factor_ > 0.0)
         {
-          ROS_INFO("Power consumption increased ");
+          metacontrol_sim::IncreaseConsumptionFactor increase_srv;
+          increase_srv.request.increase_consumption = log_data.increase_power_factor_;
+          if (log_data.inc_power_client.call(increase_srv))
+          {
+            ROS_INFO("Power consumption increased ");
+          }
+          else
+          {
+            ROS_WARN("Failed to call service /increase_power_consumption");
+          }
+          log_data.increase_power_ = false;
         }
-        else
+        else if (log_data.send_laser_error_)
         {
-          ROS_WARN("Failed to call service /increase_power_consumption");
+          log_data.publish_error_laser();
+          ROS_INFO("Error laser msg sent ");
+          log_data.send_laser_error_ = false;
         }
-        log_data.increase_power_ = false;
       }
     }
     if(log_data.elapsed_time_ >  240)
