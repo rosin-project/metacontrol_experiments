@@ -155,8 +155,8 @@ energy_over_threshold_(0)
   nh_private_.param("increase_power_factor", increase_power_factor, 0.0);
   nh_private_.param("send_laser_error", send_laser_error, false);
   nh_private_.param("max_run_time", max_run_time, 500.0);
-  nh_.param("/nfr_energy", energy_threshold, 0.5);
-  nh_.param("/nfr_safety", safety_threshold, 0.8);
+  nh_private_.param("nfr_energy", energy_threshold, 0.5);
+  nh_private_.param("nfr_safety", safety_threshold, 0.8);
   nh_private_.param("max_run_time", max_run_time, 500.0);
 
   if (send_laser_error)
@@ -411,7 +411,7 @@ bool LogData::open_log_file()
     }
     catch (std::ofstream::failure &writeErr)
     {
-        ROS_ERROR("Exception occured when writing to a file - %s", writeErr.what());
+        ROS_ERROR("Exception occurred when writing to a file - %s", writeErr.what());
         is_open = false;
     }
     return is_open;
@@ -435,8 +435,10 @@ bool LogData::write_log_header()
     log_data_file_ << "QA_error, ";
     log_data_file_ << "safety_over_threshold, ";
     log_data_file_ << "safety_under_threshold, ";
+    log_data_file_ << "percentage_above_safety, ";
     log_data_file_ << "energy_over_threshold, ";
     log_data_file_ << "energy_under_threshold, ";
+    log_data_file_ << "percentage_above_safety, ";
     log_data_file_ << "n_reconfigurations, ";
     log_data_file_ << "reconfig_time, ";
     log_data_file_ << "received_goals, ";
@@ -515,9 +517,16 @@ void LogData::store_info()
         energy_under_threshold_ += 1;
       }
 
+      double percentage_over_safety;
+      double percentage_over_energy;
+
+      percentage_over_safety = double(safety_over_threshold_) / double(safety_over_threshold_ + safety_under_threshold_);
+      percentage_over_energy = double(energy_over_threshold_) / double(energy_over_threshold_ + energy_under_threshold_);
+
       // under / over thr
       tmp_string.clear();
-      sprintf(buffer, "%d, %d, %d, %d, ", safety_over_threshold_, safety_under_threshold_, energy_over_threshold_, energy_under_threshold_);
+      sprintf(buffer, "%d, %d, %.2f, %d, %d, %.2f, ", safety_over_threshold_, safety_under_threshold_, percentage_over_safety, energy_over_threshold_, energy_under_threshold_, percentage_over_energy);
+
       tmp_string = buffer;
       log_data_file_ << tmp_string.c_str();
 

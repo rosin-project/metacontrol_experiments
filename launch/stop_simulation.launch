@@ -9,6 +9,8 @@
     <arg name="goal_nr" default="1"/>
     <arg name="increase_power" default="0.0"/>
     <arg name="send_laser_error" default="false"/>
+    <arg name="nfr_energy" default="0.5"/>
+    <arg name="nfr_safety" default="0.5"/>
     <arg name="nav_profile" default=""/>
 
     <node pkg="metacontrol_experiments" type="stop_simulation_node" name="stop_simulation_node" output="screen" required="true">
@@ -16,7 +18,10 @@
         <param name="store_data_freq" value="$(arg store_data_freq)" type="double"/>
         <param name="increase_power_factor" value="$(arg increase_power)" type="double"/>
         <param name="send_laser_error" value="$(arg send_laser_error)" type="bool"/>
+        <param name="nfr_energy" value="$(arg nfr_energy)"/>
+        <param name="nfr_safety" value="$(arg nfr_safety)"/>
     </node>
+
     
     <!-- Record data  -->
     <node pkg="rosbag" type="record" name="record_bag_node" output="screen" if="$(arg record_bags)"
