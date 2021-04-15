@@ -42,7 +42,7 @@ declare goal_position="1"
 declare launch_reconfiguration="true"
 
 ## nfr energy threshold ([0 - 1])
-declare nfr_energy="0.65"
+declare nfr_energy="0.6"
 
 ## nfr safety threshold ([0 - 1])
 declare nfr_safety="0.65"
@@ -62,11 +62,11 @@ declare increase_power="1.5"
 ## Modify log frequency
 ## Frequency at wich log files are stored
 # Possible values (0: no logs. Any value larger than 0, will be the log frequency)
-declare log_frequency="1.0"
+declare log_frequency="2.5"
 ###
 
 ### Whether or not to close the reasoner terminal
-declare close_reasoner_terminal="false"
+declare close_reasoner_terminal="true"
 
 ### Whether or not to launch RVIZ
 declare rviz="false"
@@ -153,13 +153,13 @@ kill_running_ros_nodes
 wait_for_gzserver_to_end
 
 # Get x and y initial position from yaml file - takes some creativity :)
-declare init_pos_x=$(cat $(rospack find metacontrol_experiments)/yaml/initial_positions.yaml | grep S$init_position -A 5 | tail -n 1 | cut -c 10-)
-declare init_pos_y=$(cat $(rospack find metacontrol_experiments)/yaml/initial_positions.yaml | grep S$init_position -A 6 | tail -n 1 | cut -c 10-)
+declare init_pos_x=$(cat $(rospack find metacontrol_experiments)/yaml/initial_positions.yaml | grep -w S$init_position -A 5 | tail -n 1 | cut -c 10-)
+declare init_pos_y=$(cat $(rospack find metacontrol_experiments)/yaml/initial_positions.yaml | grep -w S$init_position -A 6 | tail -n 1 | cut -c 10-)
 
 tmpfile=$(mktemp /tmp/current_goal_yaml.XXXXX)
 
 #cat $(rospack find metacontrol_experiments)/yaml/goal_positions.yaml | grep G$goal_position -A 12 | tail -n 12 > $(rospack find metacontrol_sim)/yaml/goal.yaml
-cat $(rospack find metacontrol_experiments)/yaml/goal_positions.yaml | grep G$goal_position -A 12 | tail -n 12 > $tmpfile
+cat $(rospack find metacontrol_experiments)/yaml/goal_positions.yaml | grep -w G$goal_position -A 12 | tail -n 12 > $tmpfile
 
 echo ""
 echo "Start a new simulation - Goal position: $goal_position - Initial position  $init_position - Navigation profile: $nav_profile"
@@ -197,7 +197,10 @@ bash -ic "roslaunch metacontrol_experiments stop_simulation.launch \
 		  goal_nr:=$goal_position \
 		  increase_power:=$increase_power \
 		  record_bags:=$record_rosbags \
-		  send_laser_error:=$laser_error;
+		  send_laser_error:=$laser_error \
+		  nfr_safety:=$nfr_safety \
+		  nfr_energy:=$nfr_energy \
+		  nav_profile:=$nav_profile;
 exit "
 echo "Simulation Finished!!"
 
