@@ -64,7 +64,8 @@ public:
   int goal_counter_;
   int reconfig_counter_;
   int goal_failed_counter_;
-  bool goal_rached_;
+  bool goal_reached_;
+  bool goal_successful_;
   bool increase_power_;
   bool send_laser_error_;
   float increase_power_factor_;
@@ -86,7 +87,7 @@ public:
   void power_load_callback(const std_msgs::Float32::ConstPtr& msg_power_load);
   void odom_callback(const nav_msgs::Odometry::ConstPtr& msg_odom);
   void imu_data_callback(const sensor_msgs::Imu::ConstPtr& msg_imu);
-  void safety_distance_callback(const std_msgs::Float32::ConstPtr& msg_safet_distance);
+  void safety_distance_callback(const std_msgs::Float32::ConstPtr& msg_safety_distance);
   void diagnostics_callback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg_diagnostics);
   void goal_result_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg_goal_result);
   void goal_callback(const move_base_msgs::MoveBaseActionGoal::ConstPtr& msg_goal);
@@ -128,7 +129,8 @@ linear_accel_x_(0),
 power_load_(0),
 max_run_time_(500),
 elapsed_time_(0),
-goal_rached_(false),
+goal_reached_(false),
+goal_successful_(false),
 increase_power_(false),
 send_laser_error_(false),
 increase_power_factor_(0.0),
@@ -257,9 +259,9 @@ void LogData::imu_data_callback(const sensor_msgs::Imu::ConstPtr& msg_imu)
   linear_accel_x_ = msg_imu->linear_acceleration.x;
 }
 
-void LogData::LogData::safety_distance_callback(const std_msgs::Float32::ConstPtr& msg_safet_distance)
+void LogData::LogData::safety_distance_callback(const std_msgs::Float32::ConstPtr& msg_safety_distance)
 {
-  dist_to_obstacle_ = msg_safet_distance->data;
+  dist_to_obstacle_ = msg_safety_distance->data;
 }
 
 void LogData::diagnostics_callback(const diagnostic_msgs::DiagnosticArray::ConstPtr& msg_diagnostics)
@@ -299,7 +301,8 @@ void LogData::goal_result_callback(const move_base_msgs::MoveBaseActionResult::C
 {
   if(msg_goal_result->status.status == 3)
   {
-    goal_rached_ = true;
+    goal_reached_ = true;
+    goal_successful_ = true;
   }
   else
   {
@@ -444,6 +447,8 @@ bool LogData::write_log_header()
     log_data_file_ << "received_goals, ";
     log_data_file_ << "failed_goals, ";
     log_data_file_ << "run_time, ";
+    log_data_file_ << "goal_reached, ";
+    log_data_file_ << "QA_satisfied, ";
     log_data_file_ << "reasoner_error_log";
     log_data_file_ << "\n";
     log_data_file_.close();
@@ -537,6 +542,15 @@ void LogData::store_info()
       tmp_string = buffer;
       log_data_file_ << tmp_string.c_str();
 
+      // Whether or not the goal was reached
+      log_data_file_ <<  std::string(goal_successful_ ? "true," : "false,").c_str();
+      // quality of the mission satisfied ?
+      // true only and only if (i) safety is above the safety violation less than 5% of the time
+      // (ii) energy is above the violation less than 10% of the time.
+
+      log_data_file_ << std::string((percentage_over_safety < 0.05 && percentage_over_energy < 0.1) ? "true," : "false,").c_str();
+
+
       // Add error logs from reasoner
       log_data_file_ << errors_from_reasoner_.c_str();
       errors_from_reasoner_.clear();
@@ -560,7 +574,7 @@ void LogData::timerCallback(const ros::TimerEvent& event)
   store_info();
   if (elapsed_time_ > max_run_time_)
   {
-    goal_rached_ = true;
+    goal_reached_ = true;
   }
 
 }
@@ -638,7 +652,7 @@ int main(int argc, char **argv){
       ROS_ERROR("240 seconds elapsed and no goal yet");
     }
 
-    if(log_data.goal_rached_)
+    if(log_data.goal_reached_)
     {
         log_data.store_info_timer_.stop();
         log_data.stop_simulation();
