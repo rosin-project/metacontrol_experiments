@@ -1,0 +1,220 @@
+O1:
+  pose:
+    position:
+      x: -6.25
+      y: 7.4
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O3:
+  pose:
+    position:
+      x: 5.25
+      y: 7.9
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O6:
+  pose:
+    position:
+      x: 5.7
+      y: 4.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O9:
+  pose:
+    position:
+      x: 5.7
+      y: 4.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O12:
+  pose:
+    position:
+      x: 5.9
+      y: 1.1
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O15:
+  pose:
+    position:
+      x: -2.9
+      y: 0.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O18:
+  pose:
+    position:
+      x: -8.1
+      y: -1.8
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O2:
+  pose:
+    position:
+      x: 3.4
+      y: -2.3
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O5:
+  pose:
+    position:
+      x: 5.0
+      y: -5.4
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O8:
+  pose:
+    position:
+      x: 1.6
+      y: -7.7
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O11:
+  pose:
+    position:
+      x: -4.7
+      y: -5.2
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O14:
+  pose:
+    position:
+      x: -6.9
+      y: -6.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O17:
+  pose:
+    position:
+      x: -6.3
+      y: -7.7
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O20:
+  pose:
+    position:
+      x: -2.7
+      y: 2.8
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O4:
+  pose:
+    position:
+      x: 4.4
+      y: 2.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O7:
+  pose:
+    position:
+      x: -9.1
+      y: -4.1
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O10:
+  pose:
+    position:
+      x: 4.9
+      y: 0.4
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O13:
+  pose:
+    position:
+      x: -1.3
+      y: -1.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O16:
+  pose:
+    position:
+      x: -4.25
+      y: 2.9
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+O19:
+  pose:
+    position:
+      x: -5.0
+      y: 8.9
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0

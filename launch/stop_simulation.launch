@@ -38,7 +38,7 @@
     </node>
     <node pkg="metacontrol_experiments" type="create_unknown_obstacles.py" name="create_unknown_obstacles_node" output="screen">
         <param name="goal_nr" value="$(arg goal_nr)" type="int"/>
-        <param name="obstacles" value="$(arg obstacles)" type="int"/>
+        <param name="n_obstacles" value="$(arg obstacles)" type="int"/>
     </node>
 
 

@@ -47,19 +47,27 @@ def add_obstacles_main():
     # Initialize a ROS Node
     rospy.init_node('spawn_unknown_obstacles')
     ros_pack = RosPack()
-    rospy.sleep(6.0)
+    rospy.sleep(1.0)
 
     # Read parameters
-    goal_nr = rospy.get_param("~goal_nr", 1)
-    n_obstacles = rospy.get_param("~n_obstacles", 1)
+    clutterness = rospy.get_param("~n_obstacles", 0)
+
+    rospy.loginfo("\n\n\n\t Clutterness: {}\n\n".format(clutterness))
+
+    if (clutterness == 1):
+        n_obstacles = 6
+    elif (clutterness == 2):
+        n_obstacles = 14
+    elif (clutterness == 3):
+        n_obstacles = 20
+    else:
+        n_obstacles = 0
 
     rospy.loginfo("Adding obstacles: " + str(n_obstacles))
 
     try:
         dict = load(file(ros_pack.get_path('metacontrol_experiments')
-                         + '/yaml/obstacle_positions_G'
-                         + str(goal_nr)
-                         + '.yaml', 'r'))
+                         + '/yaml/obstacle_positions.yaml', 'r'))
     except rospy.ROSInterruptException:
         rospy.loginfo("Error loading yaml file")
         return
