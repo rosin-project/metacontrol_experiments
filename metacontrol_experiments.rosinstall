@@ -44,3 +44,8 @@
     local-name: mc_rosgraph_manipulator
     uri: https://github.com/tud-cor/mc_rosgraph_manipulator.git
     version: master
+- git:
+    local-name: ros_model_parser
+    uri: https://github.com/ipa320/ros_model_parser.git
+    version: master
+
