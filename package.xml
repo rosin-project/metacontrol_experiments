@@ -59,6 +59,7 @@
   <build_depend>metacontrol_sim</build_depend>
   <build_depend>metacontrol_msgs</build_depend>
   <build_depend>rosgraph_msgs</build_depend>
+  <build_depend>python-catkin-tools</build_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
