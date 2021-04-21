@@ -34,7 +34,7 @@ O6:
 O9:
   pose:
     position:
-      x: 5.7
+      x: 6.5
       y: 4.5
       z: 0.0
     orientation:
@@ -56,8 +56,8 @@ O12:
 O15:
   pose:
     position:
-      x: -2.9
-      y: 0.5
+      x: -2.5
+      y: 0.0
       z: 0.0
     orientation:
       x: 0.0
@@ -100,7 +100,7 @@ O5:
 O8:
   pose:
     position:
-      x: 1.6
+      x: 1.8
       y: -7.7
       z: 0.0
     orientation:
@@ -134,7 +134,7 @@ O17:
   pose:
     position:
       x: -6.3
-      y: -7.7
+      y: -8.1
       z: 0.0
     orientation:
       x: 0.0
@@ -145,7 +145,7 @@ O20:
   pose:
     position:
       x: -2.7
-      y: 2.8
+      y: 3.6
       z: 0.0
     orientation:
       x: 0.0

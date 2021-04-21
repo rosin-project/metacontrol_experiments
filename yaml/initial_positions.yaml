@@ -3,8 +3,8 @@ name: S1
     frame_id: 'map'
   pose:
     position:
-      x: 4.5
-      y: -7.0
+      x: -8.5
+      y: 7.0
       z: 0.0
     orientation:
       x: 0.0
@@ -16,8 +16,8 @@ name: S2
     frame_id: 'map'
   pose:
     position:
-      x: 0.0
-      y: -7.0
+      x: -8.5
+      y: -6.5
       z: 0.0
     orientation:
       x: 0.0
@@ -29,12 +29,310 @@ name: S3
     frame_id: 'map'
   pose:
     position:
-      x: -4.0
-      y: 1.0
+      x: 7.9
+      y: 7.0
       z: 0.0
     orientation:
       x: 0.0
       y: 0.0
       z: 0.0
       w: 1.0
-
+name: S4
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 4.0
+      y: 8.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S5
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 0.0
+      y: 9.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S6
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -4.5
+      y: 8.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S7
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -8.5
+      y: 5.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S8
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -4.1
+      y: 5.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S9
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 2.5
+      y: 7.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S10
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 4.5
+      y: 6.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S11
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 7.9
+      y: 3.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S12
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 1.7
+      y: 2.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S13
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -2.5
+      y: 2.1
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S14
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -6.8
+      y: 1.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S15
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -8.8
+      y: -0.7
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S16
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -3.8
+      y: 0.1
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S17
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S18
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 3.7
+      y: 0.5
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S19
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 7.9
+      y: 0.4
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S20
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 5.4
+      y: -3.7
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S21
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 0.0
+      y: -3.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S22
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -3.65
+      y: -2.38
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S23
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -8.7
+      y: -2.8
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S24
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: -4.4
+      y: -6.7
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S25
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 4.5
+      y: -7.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+name: S26
+  header:
+    frame_id: 'map'
+  pose:
+    position:
+      x: 0.0
+      y: -7.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0

@@ -80,6 +80,8 @@ public:
   int safety_under_threshold_;
   double energy_threshold_;
   double safety_threshold_;
+  double average_safety_;
+  int safety_over_zero_count_;
 
   std::string errors_from_reasoner_;
 
@@ -138,7 +140,9 @@ safety_under_threshold_(0),
 energy_under_threshold_(0),
 safety_over_threshold_(0),
 reconfig_time_(0),
-energy_over_threshold_(0)
+energy_over_threshold_(0),
+safety_over_zero_count_(1),
+average_safety_(0)
 {
 
   std::string data_log_folder;
@@ -449,6 +453,7 @@ bool LogData::write_log_header()
     log_data_file_ << "run_time, ";
     log_data_file_ << "goal_reached, ";
     log_data_file_ << "QA_satisfied, ";
+    log_data_file_ << "Av_safety_satisfied, ";
     log_data_file_ << "reasoner_error_log";
     log_data_file_ << "\n";
     log_data_file_.close();
@@ -528,6 +533,12 @@ void LogData::store_info()
       percentage_over_safety = double(safety_over_threshold_) / double(safety_over_threshold_ + safety_under_threshold_);
       percentage_over_energy = double(energy_over_threshold_) / double(energy_over_threshold_ + energy_under_threshold_);
 
+      if (safety_numeric > 0.0)
+      {
+        average_safety_ = average_safety_ + ((safety_numeric - average_safety_)/double(safety_over_zero_count_));
+        safety_over_zero_count_ ++;
+      }
+
       // under / over thr
       tmp_string.clear();
       sprintf(buffer, "%d, %d, %.2f, %d, %d, %.2f, ", safety_over_threshold_, safety_under_threshold_, percentage_over_safety, energy_over_threshold_, energy_under_threshold_, percentage_over_energy);
@@ -544,11 +555,22 @@ void LogData::store_info()
 
       // Whether or not the goal was reached
       log_data_file_ <<  std::string(goal_successful_ ? "true," : "false,").c_str();
+      
       // quality of the mission satisfied ?
       // true only and only if (i) safety is above the safety violation less than 5% of the time
       // (ii) energy is above the violation less than 10% of the time.
 
       log_data_file_ << std::string((percentage_over_safety < 0.05 && percentage_over_energy < 0.1) ? "true," : "false,").c_str();
+
+      // average safety of the mission satisfied ?
+      // true only (i) safety average is below 0.4
+
+      // tmp_string.clear();
+      // sprintf(buffer, "%.2f, ", average_safety_);
+      // tmp_string = buffer;
+      // log_data_file_ << tmp_string.c_str();
+
+      log_data_file_ << std::string((average_safety_ < 0.5) ? "true," : "false,").c_str();
 
 
       // Add error logs from reasoner
