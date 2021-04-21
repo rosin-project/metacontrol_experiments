@@ -41,5 +41,9 @@
         <param name="n_obstacles" value="$(arg obstacles)" type="int"/>
     </node>
 
+    <node pkg="cob_monitoring" type="cpu_monitor.py" name="cpu_monitoring" output="screen">
+    </node>
+
+
 
 </launch>

@@ -82,6 +82,8 @@ public:
   double safety_threshold_;
   double average_safety_;
   int safety_over_zero_count_;
+  std::string av_cpu_load_;
+  std::string memory_used_;
 
   std::string errors_from_reasoner_;
 
@@ -275,7 +277,34 @@ void LogData::diagnostics_callback(const diagnostic_msgs::DiagnosticArray::Const
   {
     diagnostic_msgs::DiagnosticStatus tmp_diagnostic = msg_diagnostics->status[i];
 
-    if (tmp_diagnostic.message.compare(0, 2, "QA") == 0 )
+    if (tmp_diagnostic.name.compare("CPU Usage") == 0 )
+    {
+      // ROS_INFO("[LogData :: diagnostics_callback] - Message: %s", tmp_diagnostic.message.c_str());
+      if (tmp_diagnostic.values.size() > 1)
+      {
+        // if (tmp_diagnostic.values[1].key.compare("1 min Load Average") == 0)
+        // {
+            av_cpu_load_ = tmp_diagnostic.values[1].value;
+        // }
+      }
+    }
+    else if (tmp_diagnostic.name.compare("Memory Usage") == 0 )
+    {
+     // ROS_INFO("[LogData :: diagnostics_callback] - Message: %s", tmp_diagnostic.message.c_str());
+      if (tmp_diagnostic.values.size() > 1)
+      {
+        if (tmp_diagnostic.values[1].key.compare("Mem Used") == 0)
+        {
+            memory_used_ = tmp_diagnostic.values[1].value;
+        }
+      }
+    }
+    else if (tmp_diagnostic.name.compare(0, 2, "QA") == 0 )
+    {
+     // ROS_INFO("[LogData :: diagnostics_callback] - Message: %s", tmp_diagnostic.message.c_str());
+      updateQA(tmp_diagnostic);
+    }
+    else if (tmp_diagnostic.message.compare(0, 2, "QA") == 0 )
     {
      // ROS_INFO("[LogData :: diagnostics_callback] - Message: %s", tmp_diagnostic.message.c_str());
       updateQA(tmp_diagnostic);
@@ -300,6 +329,7 @@ void LogData::updateQA(const diagnostic_msgs::DiagnosticStatus diagnostic_status
     qa_obj_error_ = diagnostic_status.values[0].value;
   }
 }
+
 
 void LogData::goal_result_callback(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg_goal_result)
 {
@@ -454,6 +484,8 @@ bool LogData::write_log_header()
     log_data_file_ << "goal_reached, ";
     log_data_file_ << "QA_satisfied, ";
     log_data_file_ << "Av_safety_satisfied, ";
+    log_data_file_ << "Average CPU Usage, ";
+    log_data_file_ << "Memory Compsumption, ";
     log_data_file_ << "reasoner_error_log";
     log_data_file_ << "\n";
     log_data_file_.close();
@@ -570,8 +602,12 @@ void LogData::store_info()
       // tmp_string = buffer;
       // log_data_file_ << tmp_string.c_str();
 
-      log_data_file_ << std::string((average_safety_ < 0.5) ? "true," : "false,").c_str();
+      log_data_file_ << std::string((average_safety_ < 0.6) ? "true," : "false,").c_str();
 
+      // Cpu ussage and memory compsumption
+      tmp_string.clear();
+      tmp_string = av_cpu_load_ + std::string(", ") + memory_used_ + std::string(", ");
+      log_data_file_ << tmp_string.c_str();
 
       // Add error logs from reasoner
       log_data_file_ << errors_from_reasoner_.c_str();
