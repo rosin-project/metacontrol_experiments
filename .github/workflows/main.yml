@@ -44,7 +44,7 @@ jobs:
       - name: Run experiments
         run: |
           bash ./run_experiments.sh ${{ matrix.profile }}
-          # Find the csv file and rename it according to the profile name.
+          # Find the csv file and rename it according to the profile name
           # Assuming there is only 1 csv file
           find ${{ env.LOG_DIR }} -name "*.csv" -exec mv {} ${{ env.LOG_DIR }}/${{ env.LOG_FILENAME }}${{ matrix.profile }}
       - name: 'Upload log artifact'
