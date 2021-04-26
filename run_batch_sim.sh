@@ -11,14 +11,16 @@
 declare count_simulations=1
 
 # Declare reconfiguration (true or false)
-declare reconfiguration="false"
+declare reconfiguration="true"
 
 #for time_step in $(seq 1 50)
 # for nav_profile in ${NavProfile[@]};
 # do
-for goal_position in 1 2 3
+# for goal_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+for goal_position in 1 2
 do
-	for init_position in 1 2 3
+#	for init_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+	for init_position in 1 2
 	do
 		for obstacles in 0
 		do
