@@ -22,6 +22,11 @@ do
 #	for init_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
 	for init_position in 1 2
 	do
+		if [ $goal_position -eq $init_position ]; then
+			continue # Continue at loop on 2nd level, that is "outer loop".
+			# Replace above line with a simple "continue"
+			# to see normal loop behavior.
+		fi
 		for obstacles in 0
 		do
 			for increase_power in 0
