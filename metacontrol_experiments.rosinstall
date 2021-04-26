@@ -38,8 +38,8 @@
     version: master
 - git:
     local-name: metacontrol_experiments
-    uri: https://github.com/ipa-hsd/metacontrol_experiments.git
-    version: actions
+    uri: https://github.com/rosin-project/metacontrol_experiments.git
+    version: master
 - git:
     local-name: mc_rosgraph_manipulator
     uri: https://github.com/tud-cor/mc_rosgraph_manipulator.git
