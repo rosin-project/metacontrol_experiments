@@ -55,7 +55,7 @@ name: G5
     frame_id: 'map'
   pose:
     position:
-      x: 0.0
+      x: 0.1
       y: 9.0
       z: 0.0
     orientation:
@@ -68,8 +68,8 @@ name: G6
     frame_id: 'map'
   pose:
     position:
-      x: -4.5
-      y: 8.5
+      x: -4.2
+      y: 7.8
       z: 0.0
     orientation:
       x: 0.0
@@ -107,7 +107,7 @@ name: G9
     frame_id: 'map'
   pose:
     position:
-      x: 2.5
+      x: 2.6
       y: 7.0
       z: 0.0
     orientation:
@@ -186,7 +186,7 @@ name: G15
   pose:
     position:
       x: -8.8
-      y: -0.7
+      y: -0.5
       z: 0.0
     orientation:
       x: 0.0
@@ -211,8 +211,8 @@ name: G17
     frame_id: 'map'
   pose:
     position:
-      x: 0.0
-      y: 0.0
+      x: 0.1
+      y: 0.1
       z: 0.0
     orientation:
       x: 0.0
@@ -263,7 +263,7 @@ name: G21
     frame_id: 'map'
   pose:
     position:
-      x: 0.0
+      x: -0.1
       y: -3.0
       z: 0.0
     orientation:
@@ -328,7 +328,7 @@ name: G26
     frame_id: 'map'
   pose:
     position:
-      x: 0.0
+      x: -0.1
       y: -7.0
       z: 0.0
     orientation:
