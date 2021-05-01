@@ -145,6 +145,7 @@ wait_for_gzserver_to_end () {
 				echo "kill -9 $i (rosnode)"
 				kill -9 $i;
 			done
+		fi
 	done
 }
 
