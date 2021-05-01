@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request] # on all pushes and PRs
 
 jobs:
-    mc_power:
+  mc_power:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -61,7 +61,8 @@ jobs:
         with:
           name: log-artifact-${{ github.run_id }}-${{ matrix.profile }}-R_${{ matrix.reconfiguration }}-${{ steps.time.outputs.time }}
           path: ${{ env.LOG_DIR }}
-    base_power:
+  
+  base_power:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -119,7 +120,7 @@ jobs:
         with:
           name: log-artifact-${{ github.run_id }}-${{ matrix.profile }}-R_${{ matrix.reconfiguration }}-${{ steps.time.outputs.time }}
           path: ${{ env.LOG_DIR }}
-
+  
   mc_obstacles:
     runs-on: ubuntu-latest
     strategy:
@@ -178,6 +179,7 @@ jobs:
         with:
           name: log-artifact-${{ github.run_id }}-${{ matrix.profile }}-R_${{ matrix.reconfiguration }}-${{ steps.time.outputs.time }}
           path: ${{ env.LOG_DIR }}
+  
   base_obstacles:
     runs-on: ubuntu-latest
     strategy:
