@@ -119,8 +119,9 @@ done
 #printf "Argument increase power is %s\n" "$increase_power"
 
 wait_for_gzserver_to_end () {
-
-	for t in $(seq 1 100)
+	
+	sleep 1
+	for t in $(seq 1 20)
 	do
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
@@ -135,14 +136,15 @@ wait_for_gzserver_to_end () {
 					echo "kill -9 $i (gzerver)"
 					kill -9 $i;
 				done
-				for i in $(ps ax | grep ros | grep -v vscode | grep -v grep | awk '{print $1}')
-				do
-					echo "kill -9 $i (rosnode)"
-					kill -9 $i;
-				done
 			fi
 		fi
-		sleep 1
+		if test -z "$(ps ax | grep ros | grep -v grep )"
+		then
+			for i in $(ps ax | grep ros | grep -v vscode | grep -v grep | awk '{print $1}')
+			do
+				echo "kill -9 $i (rosnode)"
+				kill -9 $i;
+			done
 	done
 }
 
@@ -172,7 +174,7 @@ kill_running_ros_nodes () {
 echo "Make sure there is no other gazebo instances or ROS nodes running:"
 
 # Check that there are not running ros nodes
-kill_running_ros_nodes
+# kill_running_ros_nodes
 # If gazebo is running, it may take a while to end
 wait_for_gzserver_to_end
 
@@ -234,4 +236,4 @@ rm "$tmpfile"
 # Check that there are not running ros nodes
 kill_running_ros_nodes
 # Wait for gazebo to end
-wait_for_gzserver_to_end
+# wait_for_gzserver_to_end
