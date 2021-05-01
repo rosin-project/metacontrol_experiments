@@ -19,6 +19,7 @@ jobs:
                 #  "f3_v2_r1", "f3_v2_r2", "f3_v2_r3",
                 #  "f3_v3_r1", "f3_v3_r2", "f3_v3_r3",
                 #  "f1_v1_r3_k", "f1_v3_r1_k", "f2_v1_r3_k"]
+        reconfiguration: ["true", "false"]
     container:
       image: ${{ matrix.distro }}
     env:
@@ -44,16 +45,16 @@ jobs:
           format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Run experiments
         run: |
-          bash ./run_experiments.sh ${{ matrix.profile }}
+          bash ./run_experiments.sh ${{ matrix.profile }} ${{ matrix.reconfiguration }}
           # Find the csv file and rename it according to the profile name
           # Assuming there is only 1 csv file
-          i=1;
-          for f in $(find ${{ env.LOG_DIR }} -name "*.csv");
-          do mv $f ${{ env.LOG_DIR }}/${{ env.LOG_FILENAME }}${{ github.run_id }}-${{ matrix.profile }}_$i.csv;
-          i=$((i+1));
-          done
+          #i=1;
+          #for f in $(find ${{ env.LOG_DIR }} -name "*.csv");
+          #do mv $f ${{ env.LOG_DIR }}/${{ env.LOG_FILENAME }}${{ github.run_id }}-R_${{ matrix.profile }}-${{ matrix.reconfiguration }}_$i.csv;
+          #i=$((i+1));
+          #done
       - name: 'Upload log artifact'
         uses: actions/upload-artifact@v2
         with:
-          name: log-artifact-${{ github.run_id }}-${{ matrix.profile }}-${{ steps.time.outputs.time }}
+          name: log-artifact-${{ github.run_id }}-${{ matrix.profile }}-R_${{ matrix.reconfiguration }}-${{ steps.time.outputs.time }}
           path: ${{ env.LOG_DIR }}
