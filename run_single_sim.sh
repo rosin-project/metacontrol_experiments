@@ -130,7 +130,7 @@ wait_for_gzserver_to_end () {
 			echo " -- gzserver still running"
 		fi
 		sleep 1
-		if [[$t >= 10]]
+		if [[$t -gt 10]]
 		then
 			for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
 			do
