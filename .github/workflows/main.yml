@@ -22,7 +22,7 @@ jobs:
         reconfiguration: ["true"]
         component: ["false"]
         obstacles: ["0"]
-        power: ["0" "1.2" "1.4" "1.6"]
+        power: ["0", "1.2", "1.4", "1.6"]
     container:
       image: ${{ matrix.distro }}
     env:
