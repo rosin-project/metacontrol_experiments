@@ -52,7 +52,7 @@ do
 				count_simulations=$((count_simulations+1))
 			done
 		done
-		echo "Moving logs to folder $(rospack find metacontrol_experiments)/ros/metacontrol_ws/src/metacontrol_experiments/data/R$reconfiguration/C$component\_O$obstacles\_P$increase_power\_N$1"
+		echo "Moving logs to folder $(rospack find metacontrol_experiments)/ros/metacontrol_ws/src/metacontrol_experiments/data/R$2/C$component\_O$obstacles\_P$increase_power\_N$1"
 		mkdir -p $(rospack find metacontrol_experiments)/data/R$2/C$component\_O$obstacles\_P$increase_power\_N$1
 		tail -n 1 -q $(rospack find metacontrol_experiments)/data/*.csv >> $(rospack find metacontrol_experiments)/data/R$2\_C$component\_O$obstacles\_P$increase_power\_N$1.csv
 		mv $(rospack find metacontrol_experiments)/data/*.csv $(rospack find metacontrol_experiments)/data/R$2/C$component\_O$obstacles\_P$increase_power\_N$1/
