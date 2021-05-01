@@ -128,10 +128,6 @@ wait_for_gzserver_to_end () {
 			break
 		else
 			echo " -- gzserver still running"
-		fi
-		sleep 1
-		if $t -gt 10 
-		then
 			for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
 			do
 				echo "kill -9 $i (gzerver)"
@@ -143,6 +139,7 @@ wait_for_gzserver_to_end () {
 				kill -9 $i;
 			done
 		fi
+		sleep 1
 	done
 }
 
