@@ -120,8 +120,7 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	sleep 1
-	for t in $(seq 1 20)
+	for t in $(seq 1 12)
 	do
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
@@ -129,10 +128,14 @@ wait_for_gzserver_to_end () {
 			break
 		else
 			echo " -- gzserver still running"
-			if [ $t -gt 10 ]
+			if [ $t -gt 6 ]
 			then
 				for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
 				do
+					echo "lsof -p $i (gzerver)"
+					lsof -p $i
+					echo "strace -p $i (gzerver)"
+					strace -p $i
 					echo "kill -9 $i (gzerver)"
 					kill -9 $i;
 				done
@@ -145,7 +148,8 @@ wait_for_gzserver_to_end () {
 				echo "kill -9 $i (rosnode)"
 				kill -9 $i;
 			done
-		fi
+		fi	
+	sleep 0.2
 	done
 }
 
