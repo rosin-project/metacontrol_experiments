@@ -80,7 +80,7 @@ jobs:
         reconfiguration: ["false"]
         component: ["false"]
         obstacles: ["0"]
-        power: ["0" "1.2" "1.4" "1.6"]
+        power: ["0", "1.2", "1.4", "1.6"]
     container:
       image: ${{ matrix.distro }}
     env:
@@ -138,7 +138,7 @@ jobs:
                 #  "f1_v1_r3_k", "f1_v3_r1_k", "f2_v1_r3_k"]
         reconfiguration: ["true"]
         component: ["false"]
-        obstacles: ["0" "1" "2" "3"]
+        obstacles: ["0", "1", "2", "3"]
         power: ["0"]
     container:
       image: ${{ matrix.distro }}
@@ -196,7 +196,7 @@ jobs:
                 #  "f1_v1_r3_k", "f1_v3_r1_k", "f2_v1_r3_k"]
         reconfiguration: ["false"]
         component: ["false"]
-        obstacles: ["0" "1" "2" "3"]
+        obstacles: ["0", "1", "2", "3"]
         power: ["0"]
     container:
       image: ${{ matrix.distro }}
@@ -255,8 +255,8 @@ jobs:
                 #  "f1_v1_r3_k", "f1_v3_r1_k", "f2_v1_r3_k"]
         reconfiguration: ["true"]
         component: ["true"]
-        obstacles: ["0" "1" "2" "3"]
-        power: ["0" "1.2" "1.4" "1.6"]
+        obstacles: ["0"]
+        power: ["0"]
     container:
       image: ${{ matrix.distro }}
     env:
