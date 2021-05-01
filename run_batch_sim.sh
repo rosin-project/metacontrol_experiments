@@ -11,35 +11,47 @@
 declare count_simulations=1
 
 # Declare reconfiguration (true or false)
-declare reconfiguration="true"
+declare Reconfigurations=("false" "true")
+
+# Declare reconfiguration (true or false)
+declare ComponentErrors=("true" "false")
 
 #for time_step in $(seq 1 50)
-# for nav_profile in ${NavProfile[@]};
-# do
-# for goal_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-for goal_position in 1 2 3
+for reconfiguration in ${Reconfigurations[@]};
 do
-#	for init_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-	for init_position in 1 2 3
+	for component in ${ComponentErrors[@]};
 	do
-		if [ $goal_position -eq $init_position ]; then
-			continue # Continue at loop on 2nd level, that is "outer loop".
-			# Replace above line with a simple "continue"
-			# to see normal loop behavior.
+		if [ $reconfiguration == "false" ]
+		then
+			if [ $component == "true" ]
+			then
+				continue 	# Continue at the "outer loop".
+			fi
 		fi
 		for obstacles in 0
 		do
 			for increase_power in 0
 			do
-				echo "######################################################"
-				echo "#                                                    #"
-				echo "#  Running simulation NR: $count_simulations OF 27   #"
-				echo "#                                                    #"
-				echo "######################################################"
+				# for goal_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+				for goal_position in 1 2
+				do
+				#	for init_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
+					for init_position in 2 3
+					do
+						if [ $goal_position -eq $init_position ]; then
+							continue # Continue at loop on 2nd level, that is "outer loop".
+						fi
+						echo "######################################################"
+						echo "#                                                    #"
+						echo "#  Running simulation NR: $count_simulations OF 27   #"
+						echo "#                                                    #"
+						echo "######################################################"
 
-				bash -ic "./run_single_sim.sh -i $init_position -g $goal_position -n $1 -o $obstacles -p $increase_power -r $reconfiguration -l 1.0;
-				exit;"
-				count_simulations=$((count_simulations+1))
+						bash -ic "./run_single_sim.sh -i $init_position -g $goal_position -n $1 -o $obstacles -p $increase_power -r $reconfiguration -l 1.0;
+						exit;"
+						count_simulations=$((count_simulations+1))
+					done
+				done
 			done
 		done
 	done
