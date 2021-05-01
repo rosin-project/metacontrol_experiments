@@ -46,7 +46,11 @@ jobs:
           bash ./run_experiments.sh ${{ matrix.profile }}
           # Find the csv file and rename it according to the profile name
           # Assuming there is only 1 csv file
-          find ${{ env.LOG_DIR }} -name "*.csv" -exec mv {} ${{ env.LOG_DIR }}/${{ env.LOG_FILENAME }}${{ github.run_id }}-${{ matrix.profile }}.csv \;
+          i=1;
+          for f in $(find ${{ env.LOG_DIR }} -name "*.csv");
+          do mv $f ${{ env.LOG_DIR }}/${{ env.LOG_FILENAME }}${{ github.run_id }}-${{ matrix.profile }}_$i.csv;
+          i=$((i+1));
+          done
       - name: 'Upload log artifact'
         uses: actions/upload-artifact@v2
         with:
