@@ -128,16 +128,19 @@ wait_for_gzserver_to_end () {
 			break
 		else
 			echo " -- gzserver still running"
-			for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
-			do
-				echo "kill -9 $i (gzerver)"
-				kill -9 $i;
-			done
-			for i in $(ps ax | grep ros | grep -v vscode | grep -v grep | awk '{print $1}')
-			do
-				echo "kill -9 $i (rosnode)"
-				kill -9 $i;
-			done
+			if [ $t -gt 10 ]
+			then
+				for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
+				do
+					echo "kill -9 $i (gzerver)"
+					kill -9 $i;
+				done
+				for i in $(ps ax | grep ros | grep -v vscode | grep -v grep | awk '{print $1}')
+				do
+					echo "kill -9 $i (rosnode)"
+					kill -9 $i;
+				done
+			fi
 		fi
 		sleep 1
 	done
