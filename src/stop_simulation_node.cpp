@@ -174,10 +174,10 @@ average_memory_(0)
   nh_private_.param("store_data_freq", store_log_freq, 1.0);
   nh_private_.param("increase_power_factor", increase_power_factor, 0.0);
   nh_private_.param("send_laser_error", send_laser_error, false);
-  nh_private_.param("max_run_time", max_run_time, 500.0);
+  nh_private_.param("max_run_time", max_run_time, 250.0);
   nh_private_.param("nfr_energy", energy_threshold, 0.5);
   nh_private_.param("nfr_safety", safety_threshold, 0.8);
-  nh_private_.param("max_run_time", max_run_time, 500.0);
+
 
   if (send_laser_error)
   {
@@ -756,10 +756,10 @@ int main(int argc, char **argv){
         }
       }
     }
-    if(log_data.elapsed_time_ >  240)
+    if(log_data.elapsed_time_ >  200)
     {
-      if(log_data.elapsed_time_ <  250)
-      ROS_ERROR("240 seconds elapsed and no goal yet");
+      if(log_data.elapsed_time_ <  210)
+      ROS_ERROR("200 seconds elapsed and no goal yet");
     }
 
     if(log_data.goal_reached_)
