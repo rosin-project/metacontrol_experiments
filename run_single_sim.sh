@@ -173,6 +173,8 @@ cat $(rospack find metacontrol_experiments)/yaml/goal_positions.yaml | grep -w G
 
 echo ""
 echo "Start a new simulation - Goal position: $goal_position - Initial position  $init_position - Navigation profile: $nav_profile"
+echo "Start a new simulation - Obstacles: $obstacles - Power increase  $increase_power"
+echo "Start a new simulation - Reconfiguration: $launch_reconfiguration - Component error  $laser_error"
 echo ""
 echo "Launch roscore"
 bash -c "roscore; exit" &
