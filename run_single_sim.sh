@@ -120,7 +120,7 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 12)
+	for t in $(seq 1 14)
 	do
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
@@ -132,10 +132,10 @@ wait_for_gzserver_to_end () {
 			then
 				for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
 				do
-					echo "lsof -p $i (gzerver)"
-					lsof -p $i
-					echo "strace -p $i (gzerver)"
-					strace -p $i
+					# echo "lsof -p $i (gzerver)"
+					# lsof -p $i
+					# echo "strace -p $i (gzerver)"
+					# strace -p $i
 					echo "kill -9 $i (gzerver)"
 					kill -9 $i;
 				done
