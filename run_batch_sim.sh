@@ -28,15 +28,15 @@ then
 		continue 	# Continue at the "outer loop".
 	fi
 fi
-for obstacles in 0 1
-do
-	for increase_power in 0 1.2
-	do
+obstacles=$4
+increase_power=$5
 		# for goal_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-		for goal_position in 14 
+		#for goal_position in 14 
+		for goal_position in 2
 		do
 		#	for init_position in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-			for init_position in 2 
+			#for init_position in 2 
+			for init_position in 16 14
 			do
 				if [[ $goal_position -eq $init_position ]]; then
 					continue # Continue at loop on 2nd level, that is "outer loop".
@@ -56,8 +56,8 @@ do
 		mkdir -p $(rospack find metacontrol_experiments)/data/R$2/C$component\_O$obstacles\_P$increase_power\_N$1
 		tail -n 1 -q $(rospack find metacontrol_experiments)/data/*.csv >> $(rospack find metacontrol_experiments)/data/R$2\_C$component\_O$obstacles\_P$increase_power\_N$1.csv
 		mv $(rospack find metacontrol_experiments)/data/*.csv $(rospack find metacontrol_experiments)/data/R$2/C$component\_O$obstacles\_P$increase_power\_N$1/
-	done
-done
+# done
+# done
 # done
 # done
 	# echo "Moving logs to folder $HOME/ros/metacontrol_ws/src/metacontrol_experiments/data/$nav_profile"

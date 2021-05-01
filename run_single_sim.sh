@@ -130,7 +130,7 @@ wait_for_gzserver_to_end () {
 			echo " -- gzserver still running"
 		fi
 		sleep 1
-		if [[$t -gt 10]]
+		if $t -gt 10 
 		then
 			for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
 			do
@@ -157,7 +157,7 @@ kill_running_ros_nodes () {
 	for i in $(ps -aux | grep reasoner_node | grep -v /ros/ | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -2 $i"
-		kill -2 $i;
+		kill -9 $i;
 	done
 	sleep 1
 	for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
