@@ -81,7 +81,13 @@ public:
   double energy_threshold_;
   double safety_threshold_;
   double average_safety_;
+  double average_energy_;
+  double average_cpu_usage_;
+  double average_memory_;
+  int cpu_usage_count_;
+  int memory_count_;
   int safety_over_zero_count_;
+  int energy_over_zero_count_;
   std::string av_cpu_load_;
   std::string memory_used_;
 
@@ -144,7 +150,13 @@ safety_over_threshold_(0),
 reconfig_time_(0),
 energy_over_threshold_(0),
 safety_over_zero_count_(1),
-average_safety_(0)
+energy_over_zero_count_(1),
+average_safety_(0),
+average_energy_(0),
+cpu_usage_count_(1),
+memory_count_(1),
+average_cpu_usage_(0),
+average_memory_(0)
 {
 
   std::string data_log_folder;
@@ -186,14 +198,14 @@ average_safety_(0)
 
   sub_robot_pos_ = nh_.subscribe("/amcl_pose", 1, &LogData::robot_pose_callback, this);
   sub_power_load_ = nh_.subscribe("/power_load", 1, &LogData::power_load_callback, this);
-  sub_odometry_ = nh_.subscribe("/odom", 1, &LogData::odom_callback, this);
-  sub_imu_data_ = nh_.subscribe("/imu/data", 1, &LogData::imu_data_callback, this);
+  // sub_odometry_ = nh_.subscribe("/odom", 1, &LogData::odom_callback, this);
+  // sub_imu_data_ = nh_.subscribe("/imu/data", 1, &LogData::imu_data_callback, this);
   sub_safety_distance_ = nh_.subscribe("/d_obstacle", 1, &LogData::safety_distance_callback, this);
   sub_diagnostics_ = nh_.subscribe("/diagnostics", 1, &LogData::diagnostics_callback, this);
   sub_goal_result_ = nh_.subscribe("/move_base/result", 1, &LogData::goal_result_callback, this);
   sub_goal_ = nh_.subscribe("/move_base/goal", 1, &LogData::goal_callback, this);
   reconfig_goal_ = nh_.subscribe("/rosgraph_manipulator_action_server/goal", 1, &LogData::reconfig_callback, this);
-  rosout_sub_ = nh_.subscribe("/rosout", 1, &LogData::rosout_callback, this);
+  //rosout_sub_ = nh_.subscribe("/rosout", 1, &LogData::rosout_callback, this);
   pub_diagnostics_ = nh_.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
 
   data_log_filename_ = data_log_folder + "log_Metacontrol_sim_";
@@ -481,12 +493,14 @@ bool LogData::write_log_header()
     log_data_file_ << "received_goals, ";
     log_data_file_ << "failed_goals, ";
     log_data_file_ << "run_time, ";
+    log_data_file_ << "Av_safety, ";
+    log_data_file_ << "Av_energy, ";
     log_data_file_ << "goal_reached, ";
     log_data_file_ << "QA_satisfied, ";
     log_data_file_ << "Av_safety_satisfied, ";
+    log_data_file_ << "Mission_succesful, ";
     log_data_file_ << "Average CPU Usage, ";
-    log_data_file_ << "Memory Compsumption, ";
-    log_data_file_ << "reasoner_error_log";
+    log_data_file_ << "Memory Compsumption";
     log_data_file_ << "\n";
     log_data_file_.close();
     return true;
@@ -570,6 +584,12 @@ void LogData::store_info()
         average_safety_ = average_safety_ + ((safety_numeric - average_safety_)/double(safety_over_zero_count_));
         safety_over_zero_count_ ++;
       }
+      
+      if (energy_numeric > 0.0)
+      {
+        average_energy_ = average_energy_ + ((energy_numeric - average_energy_)/double(safety_over_zero_count_));
+        energy_over_zero_count_ ++;
+      }
 
       // under / over thr
       tmp_string.clear();
@@ -585,34 +605,66 @@ void LogData::store_info()
       tmp_string = buffer;
       log_data_file_ << tmp_string.c_str();
 
+      // average safety and average energy
+
+      tmp_string.clear();
+      sprintf(buffer, "%.3f, %.3f, ", average_safety_, average_energy_);
+      tmp_string = buffer;
+      log_data_file_ << tmp_string.c_str();
+      
+    
+
       // Whether or not the goal was reached
-      log_data_file_ <<  std::string(goal_successful_ ? "true," : "false,").c_str();
+      log_data_file_ <<  std::string(goal_successful_ ? "1," : "0,").c_str();
       
       // quality of the mission satisfied ?
       // true only and only if (i) safety is above the safety violation less than 5% of the time
       // (ii) energy is above the violation less than 10% of the time.
 
-      log_data_file_ << std::string((percentage_over_safety < 0.05 && percentage_over_energy < 0.1) ? "true," : "false,").c_str();
+      bool qa_achieved = false;
+      bool mission_successful = false;
+      
+      if (percentage_over_safety < 0.05 && percentage_over_energy < 0.1)
+        qa_achieved = true;
+      
 
-      // average safety of the mission satisfied ?
-      // true only (i) safety average is below 0.4
+      log_data_file_ << std::string(qa_achieved ? "1," : "0,").c_str();
 
-      // tmp_string.clear();
-      // sprintf(buffer, "%.2f, ", average_safety_);
-      // tmp_string = buffer;
-      // log_data_file_ << tmp_string.c_str();
+      // Average safety achieved
+      // true only (i) safety average is below 0.5
+      
+      log_data_file_ << std::string((average_safety_ < 0.5) ? "1," : "0,").c_str();
 
-      log_data_file_ << std::string((average_safety_ < 0.6) ? "true," : "false,").c_str();
+      // Mission successful
+      if (goal_successful_ && qa_achieved &&  (average_safety_ < 0.5))
+        mission_successful = true;
 
-      // Cpu ussage and memory compsumption
+      log_data_file_ << std::string(mission_successful ? "1," : "0,").c_str();
+
+
+      // compute average cpu usage
+      double cpu_usage_numeric = ::atof(av_cpu_load_.c_str());
+      if (cpu_usage_numeric > 0.0)
+      {
+        average_cpu_usage_ = average_cpu_usage_ + ((cpu_usage_numeric - average_cpu_usage_)/double(cpu_usage_count_));
+        cpu_usage_count_ ++;
+      }
+
+      double memory_numeric = ::atof(memory_used_.c_str());
+
+      if (memory_numeric > 0.0)
+      {
+        average_memory_ = average_memory_ + ((memory_numeric - average_memory_)/double(memory_count_));
+        memory_count_ ++;
+      }
+
+
+      // Average Cpu usage and memory compsumption
       tmp_string.clear();
-      tmp_string = av_cpu_load_ + std::string(", ") + memory_used_ + std::string(", ");
+      sprintf(buffer, "%.3f, %.3f ", average_cpu_usage_, average_memory_);
+      tmp_string = buffer;
       log_data_file_ << tmp_string.c_str();
-
-      // Add error logs from reasoner
-      log_data_file_ << errors_from_reasoner_.c_str();
-      errors_from_reasoner_.clear();
-
+      
       log_data_file_ << "\n";
       log_data_file_.close();
     }
