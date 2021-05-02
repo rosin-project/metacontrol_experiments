@@ -120,7 +120,7 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 10)
+	for t in $(seq 1 1000)
 	do
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
