@@ -120,7 +120,7 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 14)
+	for t in $(seq 1 10)
 	do
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
@@ -128,18 +128,10 @@ wait_for_gzserver_to_end () {
 			break
 		else
 			echo " -- gzserver still running"
-			if [ $t -gt 6 ]
-			then
-				for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
-				do
-					# echo "lsof -p $i (gzerver)"
-					# lsof -p $i
-					# echo "strace -p $i (gzerver)"
-					# strace -p $i
-					echo "kill -9 $i (gzerver)"
-					kill -9 $i;
-				done
-			fi
+			echo "kill -9 $(pidof gzserver | awk '{print $1}')"
+			kill -9 $(pidof gzserver | awk '{print $1}')
+			echo "kill -9 $(pidof gzclient | awk '{print $1}')"
+			kill -9 $(pidof gzclient | awk '{print $1}')
 		fi
 		if test -z "$(ps ax | grep ros | grep -v grep )"
 		then
@@ -148,8 +140,13 @@ wait_for_gzserver_to_end () {
 				echo "kill -9 $i (rosnode)"
 				kill -9 $i;
 			done
-		fi	
-	sleep 0.2
+		fi
+		for i in $(ps -aux | grep reasoner_node | grep -v /ros/ | grep -v grep | awk '{print $2}')
+		do
+			echo "kill -9 $i - reasoner_node"
+			kill -9 $i;
+		done
+	sleep 0.5
 	done
 }
 
@@ -161,15 +158,20 @@ kill_running_ros_nodes () {
 		kill -2 $i;
 	done
 	sleep 1
-	for i in $(ps -aux | grep reasoner_node | grep -v /ros/ | grep -v grep | awk '{print $2}')
+	for i in $(ps aux | grep reasoner_node | grep -v /ros/ | grep -v grep | awk '{print $2}')
 	do
-		echo "kill -2 $i"
+		echo "kill -2 $i - reasoner_node"
 		kill -9 $i;
 	done
 	sleep 1
-	for i in $(ps -aux | grep gzserver | grep -v grep | awk '{print $2}')
+	for i in $(ps aux | grep gzserver | grep -v grep | awk '{print $2}')
 	do
-		echo "kill -2 $i"
+		echo "kill -2 $i - gzserver"
+		kill -2 $i;
+	done
+	for i in $(ps aux | grep gzclient | grep -v grep | awk '{print $2}')
+	do
+		echo "kill -2 $i - - gzclient"
 		kill -2 $i;
 	done
 	sleep 1
