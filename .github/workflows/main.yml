@@ -203,7 +203,7 @@ jobs:
                 #  "f1_v1_r3_k", "f1_v3_r1_k", "f2_v1_r3_k"]
         reconfiguration: ["true"]
         component: ["true"]
-        obstacles: ["0",, "1", "2"]
+        obstacles: ["0", "1", "2"]
         power: ["0", "1.2", "1.4"]
     container:
       image: ${{ matrix.distro }}
