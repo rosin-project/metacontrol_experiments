@@ -120,8 +120,8 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 1000)
-	do
+	for t in $(seq 1 20)
+	do	
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
 			# echo " -- gzserver not running"
@@ -130,6 +130,13 @@ wait_for_gzserver_to_end () {
 			echo " -- gzserver still running"
 			echo "kill -9 $(pidof gzserver | awk '{print $1}')"
 			kill -9 $(pidof gzserver | awk '{print $1}')
+		fi
+		if test -z "$(ps aux | grep gzclient | grep -v grep )"
+		then
+			# echo " -- gzserver not running"
+			break
+		else
+			echo " -- gzclient still running"
 			echo "kill -9 $(pidof gzclient | awk '{print $1}')"
 			kill -9 $(pidof gzclient | awk '{print $1}')
 		fi
