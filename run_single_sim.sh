@@ -140,19 +140,6 @@ wait_for_gzserver_to_end () {
 			echo "kill -9 $(pidof gzclient | awk '{print $1}')"
 			kill -9 $(pidof gzclient | awk '{print $1}')
 		fi
-		if test -z "$(ps ax | grep ros | grep -v grep )"
-		then
-			for i in $(ps ax | grep ros | grep -v vscode | grep -v grep | awk '{print $1}')
-			do
-				echo "kill -9 $i (rosnode)"
-				kill -9 $i;
-			done
-		fi
-		for i in $(ps -aux | grep reasoner_node | grep -v /ros/ | grep -v grep | awk '{print $2}')
-		do
-			echo "kill -9 $i - reasoner_node"
-			kill -9 $i;
-		done
 	sleep 0.5
 	done
 }
@@ -165,7 +152,7 @@ kill_running_ros_nodes () {
 		kill -2 $i;
 	done
 	sleep 1
-	for i in $(ps aux | grep reasoner_node | grep -v /ros/ | grep -v grep | awk '{print $2}')
+	for i in $(ps aux | grep reasoner | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -2 $i - reasoner_node"
 		kill -9 $i;
@@ -174,14 +161,14 @@ kill_running_ros_nodes () {
 	for i in $(ps aux | grep gzserver | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -2 $i - gzserver"
-		kill -2 $i;
+		kill -9 $i;
 	done
+	sleep 1
 	for i in $(ps aux | grep gzclient | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -2 $i - - gzclient"
-		kill -2 $i;
+		kill -9 $i;
 	done
-	sleep 1
 }
 
 
@@ -250,4 +237,5 @@ rm "$tmpfile"
 # Check that there are not running ros nodes
 kill_running_ros_nodes
 # Wait for gazebo to end
+wait
 # wait_for_gzserver_to_end
