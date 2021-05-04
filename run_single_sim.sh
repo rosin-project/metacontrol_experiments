@@ -145,10 +145,9 @@ wait_for_gzserver_to_end () {
 			else
 				continue
 			fi
-			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep )
-				echo $i
-				echo "------------"
-			do
+			echo "-- Search running ros processes --"
+			echo "$(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep )"
+			echo "-- ------ --"
 			
 
 			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep | awk '{print $2}')
