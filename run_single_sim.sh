@@ -138,7 +138,7 @@ wait_for_gzserver_to_end () {
 			elif (( "$t" == "10" ))
 			then
 				signal=15
-			elif (( "$t" == "30" ))|| (( "$t" == "40" )) || (( "$t" == "50")) || (( "$t" == "60" ))
+			elif (( "$t" == "60" ))
 			then
 				signal=9
 			else
@@ -147,11 +147,18 @@ wait_for_gzserver_to_end () {
 			echo " -- gzserver still running ($t senconds)"
 			echo "--  running ros/gazebo processes --"
 			echo "$(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep )"
+			echo "-- ------ Defunct process ----- --"
+			echo "$(ps -ef | grep defunct | grep -v grep )"
 			echo "-- ------ --"
 			for i in $(ps -ef | grep defunct | grep -v grep |  awk '{print $3}')
 			do
-				echo "kill -$signal $i -- some (defunct) parent process"
-				kill -$signal $i;
+				if (( "$i" == "1" ))
+				then
+					continue
+				else
+					echo "kill -$signal $i -- some (defunct) parent process"
+					kill -$signal $i;
+				fi
 			done			
 			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep | awk '{print $2}')
 			do
@@ -164,26 +171,11 @@ wait_for_gzserver_to_end () {
 
 kill_running_ros_nodes () {
 	# Kill all ros nodes that may be running
-	for i in $(ps aux | grep ros | grep -v grep | awk '{print $2}')
-	do
-		echo "kill -15 $i"
-		kill -2 $i;
-	done
-	for i in $(ps aux | grep reasoner | grep -v grep | awk '{print $2}')
-	do
-		echo "kill -15 $i - reasoner_node"
-		kill -2 $i;
-	done
-	for i in $(ps aux | grep gzserver | grep -v grep | awk '{print $2}')
-	do
-		echo "kill -15 $i - gzserver"
-		kill -2 $i;
-	done
-	for i in $(ps aux | grep gzclient | grep -v grep | awk '{print $2}')
-	do
-		echo "kill -15 $i - - gzclient"
-		kill -2 $i;
-	done
+	for i in $(ps aux | grep -E 'roslaunch|rosmaster|roscore' | grep -v grep | awk '{print $2}')
+			do
+				echo "kill -2 $i -- kill ros process"
+				kill -2 $i;
+			done
 	sleep 2
 }
 
@@ -251,8 +243,7 @@ echo "Simulation Finished!!"
 
 # Delete temporary yaml goal file
 rm "$tmpfile"
-sleep 2
-
 # Check that there are not running ros nodes
-# kill_running_ros_nodes
+kill_running_ros_nodes
+sleep 2
 # Wait for gazebo to end
