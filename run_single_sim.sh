@@ -120,7 +120,7 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 20)
+	for t in $(seq 1 25)
 	do	
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
@@ -133,19 +133,32 @@ wait_for_gzserver_to_end () {
 		else
 			sleep 1
 			echo " -- gzserver still running ($t senconds)"
-			if (( "$t" < "10" ))
+			if (( "$t" == "2" ))
 			then
+				signal=2
+			elif (( "$t" == "10" ))
+			then
+				signal=15
+			elif (( "$t" == "20" ))
+			then
+				signal=9
+			else
 				continue
 			fi
+			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep | awk '{print $2}')
+			do
+				echo "kill -$signal $i -- some roscore node"
+				kill -$signal $i;
+			done
 			for i in $(ps aux | grep reasoner | grep -v grep | awk '{print $2}')
 			do
-				echo "-- sending: kill -9 $i - reasoner_node"
-				kill -9 $i;
+				echo "-- sending: kill -$signal $i - reasoner_node"
+				kill -$signal $i;
 			done			
 			for i in $(ps aux | grep gzserver | grep -v grep | awk '{print $2}')
 			do
-				echo "-- sending: kill -9 $i - gzserver"
-				kill -9 $i;
+				echo "-- sending: kill -$signal $i - gzserver"
+				kill  -$signal $i;
 			done
 		fi
 	done
@@ -153,25 +166,25 @@ wait_for_gzserver_to_end () {
 
 kill_running_ros_nodes () {
 	# Kill all ros nodes that may be running
-	for i in $(ps ax | grep ros | grep -v vscode | grep -v grep | awk '{print $1}')
+	for i in $(ps aux | grep ros | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -15 $i"
-		kill -15 $i;
+		kill -2 $i;
 	done
 	for i in $(ps aux | grep reasoner | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -15 $i - reasoner_node"
-		kill -15 $i;
+		kill -2 $i;
 	done
 	for i in $(ps aux | grep gzserver | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -15 $i - gzserver"
-		kill -15 $i;
+		kill -2 $i;
 	done
 	for i in $(ps aux | grep gzclient | grep -v grep | awk '{print $2}')
 	do
 		echo "kill -15 $i - - gzclient"
-		kill -15 $i;
+		kill -2 $i;
 	done
 	sleep 2
 }
@@ -233,12 +246,14 @@ bash -ic "roslaunch metacontrol_experiments stop_simulation.launch \
 		  nfr_safety:=$nfr_safety \
 		  nfr_energy:=$nfr_energy \
 		  nav_profile:=$nav_profile;
+		  rosnode kill -a;
 exit "
 echo "Simulation Finished!!"
 
 # Delete temporary yaml goal file
 rm "$tmpfile"
+sleep 2
 
 # Check that there are not running ros nodes
-kill_running_ros_nodes
+# kill_running_ros_nodes
 # Wait for gazebo to end
