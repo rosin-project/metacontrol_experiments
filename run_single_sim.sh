@@ -120,7 +120,7 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 25)
+	for t in $(seq 1 250)
 	do	
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
@@ -136,15 +136,21 @@ wait_for_gzserver_to_end () {
 			if (( "$t" == "2" ))
 			then
 				signal=2
-			elif (( "$t" == "10" ))
+			elif (( "$t" == "100" ))
 			then
 				signal=15
-			elif (( "$t" == "20" ))
+			elif (( "$t" == "200" ))
 			then
 				signal=9
 			else
 				continue
 			fi
+			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep )
+				echo $i
+				echo "------------"
+			do
+			
+
 			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep | awk '{print $2}')
 			do
 				echo "kill -$signal $i -- some roscore node"
