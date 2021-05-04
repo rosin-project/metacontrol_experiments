@@ -132,15 +132,12 @@ wait_for_gzserver_to_end () {
 			fi
 		else
 			sleep 1
-			if (( "$t" == "2" ))
+			if (( "$t" == "5" ))
 			then
 				signal=2
-			elif (( "$t" == "10" ))
-			then
-				signal=15
 			elif (( "$t" == "60" ))
 			then
-				signal=9
+				signal=15
 			else
 				continue
 			fi
