@@ -148,10 +148,14 @@ wait_for_gzserver_to_end () {
 			echo "--  running ros/gazebo processes --"
 			echo "$(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep )"
 			echo "-- ------ --"
-			
+			for i in $(ps -ef | grep defunct | grep -v grep |  awk '{print $3}')
+			do
+				echo "kill -$signal $i -- some (defunct) parent process"
+				kill -$signal $i;
+			done			
 			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep | awk '{print $2}')
 			do
-				echo "kill -$signal $i -- some roscore node"
+				echo "kill -$signal $i -- some ros process"
 				kill -$signal $i;
 			done
 		fi
