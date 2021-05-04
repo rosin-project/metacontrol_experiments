@@ -120,7 +120,7 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 250)
+	for t in $(seq 1 60)
 	do	
 		if test -z "$(ps aux | grep gzserver | grep -v grep )"
 		then
@@ -132,38 +132,27 @@ wait_for_gzserver_to_end () {
 			fi
 		else
 			sleep 1
-			echo " -- gzserver still running ($t senconds)"
 			if (( "$t" == "2" ))
 			then
 				signal=2
-			elif (( "$t" == "100" ))
+			elif (( "$t" == "10" ))
 			then
 				signal=15
-			elif (( "$t" == "200" ))
+			elif (( "$t" == "30" ))|| (( "$t" == "40" )) || (( "$t" == "50")) || (( "$t" == "60" ))
 			then
 				signal=9
 			else
 				continue
 			fi
-			echo "-- Search running ros processes --"
-			echo "$(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep )"
+			echo " -- gzserver still running ($t senconds)"
+			echo "--  running ros/gazebo processes --"
+			echo "$(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep )"
 			echo "-- ------ --"
 			
-
-			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic' | grep -v grep | awk '{print $2}')
+			for i in $(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep | awk '{print $2}')
 			do
 				echo "kill -$signal $i -- some roscore node"
 				kill -$signal $i;
-			done
-			for i in $(ps aux | grep reasoner | grep -v grep | awk '{print $2}')
-			do
-				echo "-- sending: kill -$signal $i - reasoner_node"
-				kill -$signal $i;
-			done			
-			for i in $(ps aux | grep gzserver | grep -v grep | awk '{print $2}')
-			do
-				echo "-- sending: kill -$signal $i - gzserver"
-				kill  -$signal $i;
 			done
 		fi
 	done
@@ -254,6 +243,7 @@ bash -ic "roslaunch metacontrol_experiments stop_simulation.launch \
 		  rosnode kill -a;
 exit "
 echo "Simulation Finished!!"
+
 
 # Delete temporary yaml goal file
 rm "$tmpfile"
