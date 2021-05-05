@@ -120,29 +120,29 @@ done
 
 wait_for_gzserver_to_end () {
 	
-	for t in $(seq 1 60)
+	for t in $(seq 1 120)
 	do	
-		if test -z "$(ps aux | grep gzserver | grep -v grep )"
+		if test -z "$(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep )"
 		then
 			# echo " -- gzserver not running"
-			if test -z "$(ps aux | grep reasoner | grep -v grep )"
-			then
-				# echo " -- gzserver not running"
-				break
-			fi
+			break
 		else
 			sleep 1
-			if (( "$t" == "5" ))
+			if test -z "$(ps -ef | grep gzserver | grep -v defunct | grep -v grep |)"
+			then
+				echo " -- gzserver running (defunct) ATPC"
+				break
+			fi
+			if (( "$t" == "10" ))
 			then
 				signal=2
-			elif (( "$t" == "60" ))
+			elif (( "$t" == "100" ))
 			then
 				signal=15
 			else
 				continue
 			fi
-			echo " -- gzserver still running ($t senconds)"
-			echo "--  running ros/gazebo processes --"
+			echo " -- ros/gazebo processes still running ($t seconds)"
 			echo "$(ps aux | grep -E 'roslaunch|rosmaster|gazebo|reasoner|melodic|gzserver' | grep -v grep )"
 			echo "-- ------ Defunct process ----- --"
 			echo "$(ps -ef | grep defunct | grep -v grep )"
@@ -168,12 +168,19 @@ wait_for_gzserver_to_end () {
 
 kill_running_ros_nodes () {
 	# Kill all ros nodes that may be running
-	for i in $(ps aux | grep -E 'roslaunch|rosmaster|roscore' | grep -v grep | awk '{print $2}')
-			do
-				echo "kill -2 $i -- kill ros process"
-				kill -2 $i;
-			done
-	sleep 2
+	for i in $(ps aux | grep -E 'roslaunch' | grep -v grep | awk '{print $2}')
+	do
+		echo "kill -2 $i -- kill roslaunch process"
+		kill -2 $i;
+	done
+	sleep 4
+	# Kill all ros nodes that may be running
+	for i in $(ps aux | grep -E 'roslaunch|rosmaster|rosout|roscore' | grep -v grep | awk '{print $2}')
+	do
+		echo "kill -2 $i -- kill roscore process"
+		kill -2 $i;
+	done
+	sleep 4
 }
 
 
@@ -198,11 +205,12 @@ echo "Start a new simulation - Goal position: $goal_position - Initial position 
 echo "Start a new simulation - Obstacles: $obstacles - Power increase  $increase_power"
 echo "Start a new simulation - Reconfiguration: $launch_reconfiguration - Component error  $laser_error"
 echo ""
+
 echo "Launch roscore"
 bash -c "roscore; exit" &
 #Sleep Needed to allow other launchers to recognize the roscore
 sleep 3
-rosparam set /
+
 echo "Launching: MVP metacontrol world.launch"
 bash -c "roslaunch metacontrol_sim MVP_metacontrol_world.launch \
          current_goal_file:=$tmpfile \
@@ -242,5 +250,4 @@ echo "Simulation Finished!!"
 rm "$tmpfile"
 # Check that there are not running ros nodes
 kill_running_ros_nodes
-sleep 2
 # Wait for gazebo to end
