@@ -128,7 +128,7 @@ wait_for_gzserver_to_end () {
 			break
 		else
 			sleep 1
-			if test -z "$(ps -ef | grep gzserver | grep -v defunct | grep -v grep |)"
+			if test -z "$(ps -ef | grep gzserver | grep -v defunct | grep -v grep )"
 			then
 				echo " -- gzserver running (defunct) ATPC"
 				break
